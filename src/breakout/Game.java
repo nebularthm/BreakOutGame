@@ -35,7 +35,7 @@ import javafx.util.Duration;
         public static final int BLOCK_MAX_SPEED = 100;
         public static final int BLOCK_SPEEDUP_FACTOR = 2;
         public static final int BALL_SPEED = 5;
-        public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459"); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
+        public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
 
 
         // some things we need to remember during our game
@@ -72,9 +72,11 @@ import javafx.util.Duration;
             Group root = new Group();
             // make some shapes, set their properties, and add them to the scene
             myBall = new Ball(ballImage,0,height/2);
+
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
             myPaddle = new Paddle(BLOCK_SIZE/2, BLOCK_SIZE,width/2,height/2);
+            myBlockSpeed = BALL_SPEED;
             root.getChildren().add(myPaddle);
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
