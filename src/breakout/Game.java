@@ -15,8 +15,13 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
-    /**
+
+/**
      * A simple frogger-like game.
      *
      * @author Robert C. Duvall
@@ -33,6 +38,7 @@ import javafx.util.Duration;
         public static final int BLOCK_MIN_SPEED = 10;
         public static final int BLOCK_MAX_SPEED = 100;
         public static final int BLOCK_SPEEDUP_FACTOR = 2;
+        public static final int BRICK_AMOUNT = 5;
         public static final int BALL_SPEED = 50;
         public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
         public static final Image PADDLE_PICTURE = new Image("https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg",BLOCK_SIZE,BLOCK_SIZE,false,false);
@@ -44,8 +50,38 @@ import javafx.util.Duration;
         private Ball myBall;
         private ImageView boundary;
         private int myBlockSpeedX, myBlockSpeedY;
+        private Bricks [][] level;//this is a 2D array of our bricks
 
+    /**
+     * this method constructs the grid of bricks by reading the config file for a level
+     * @param levelSource string representing filename
+     * @return
+     */
+    private Bricks [][]  levelReader(String levelSource, int width, int height){
+            Bricks [][] brickconfig = new Bricks[BRICK_AMOUNT-1][BRICK_AMOUNT];
+            File lev  = new File(levelSource);
+            Scanner levelScanner;
+            try{
+                levelScanner = new Scanner(lev);
+            }
+            catch(FileNotFoundException e){
+                return new Bricks [0][0];
+            }
+            int i = 0;
+            while(levelScanner.hasNextLine()){
+                int j = 0;
+                String levelLine = levelScanner.nextLine();
+                String [] brickTypes = levelLine.split(" ");
+                for(String type:brickTypes) {
 
+                        Image defaultBrick = new Image("https://images-na.ssl-images-amazon.com/images/I/410eZ0DDF2L._SL500_AC_SS350_.jpg", 30, 30, false, false);
+                        brickconfig[i][j] = new Bricks(defaultBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT));//this is so bricks are added ight next to the next brick
+                        j++;
+                }
+                i++;
+            }
+            return brickconfig;
+        }
         /**
          * Initialize what will be displayed and how it will be updated.
          */
@@ -81,6 +117,12 @@ import javafx.util.Duration;
 
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
+            level = levelReader("data/tutorial.txt",width,height);
+            for(Bricks [] brickies:level){
+                for(Bricks brick: brickies){
+                    root.getChildren().add(brick);
+                }
+            }
             //create boundary that ball cannot pass over
             boundary = new ImageView();
             boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
@@ -92,6 +134,8 @@ import javafx.util.Duration;
         }
          // Change properties of shapes to animate them
         void step (double elapsedTime) {
+
+
             // get internal values of other classes
 //            Rectangle blockShape = myBall.getShape();
 //            Rectangle moverShape = myPaddle.getShape();
@@ -122,6 +166,15 @@ import javafx.util.Duration;
                 myBlockSpeedY *= -1;
                 myBlockSpeedX *= -1;
             }
+            //check for case when you hit a brick
+            for(Bricks [] brickies:level){
+                for(Bricks brick: brickies){
+                    if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
+                        myBlockSpeedY *= -1;
+                        myBlockSpeedX *= -1;
+                    }
+                }
+            }
             // TODO: check for win and, if true, pause the animation
         }
 
@@ -149,6 +202,13 @@ import javafx.util.Duration;
                 else {
                     myAnimation.play();
                 }
+            }
+            //when you press r this completely resets ball and paddle
+            if(code == KeyCode.R){
+                myBall.setX(0);
+                myBall.setY(myScene.getHeight()/2);
+                myPaddle.setX(myScene.getWidth()/2);
+                myPaddle.setY(myScene.getHeight()/2);
             }
         }
         public static void main (String[] args) {
