@@ -27,6 +27,7 @@ import java.util.Scanner;
      * @author Robert C. Duvall
      */
     public class Game extends Application {
+
         public static final String TITLE = "Super Breakout";
         public static final String WINNING_MESSAGE = "WINNER!";
         public static final int SIZE = 400;
@@ -34,14 +35,15 @@ import java.util.Scanner;
         public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
         public static final Paint BACKGROUND = Color.AZURE;
         public static final int PADDLE_SPEED = 10;
-        public static final int BLOCK_SIZE = 30;
+        public static final int BLOCK_SIZE = 100;
         public static final int BLOCK_MIN_SPEED = 10;
         public static final int BLOCK_MAX_SPEED = 100;
         public static final int BLOCK_SPEEDUP_FACTOR = 2;
         public static final int BRICK_AMOUNT = 5;
         public static final int BALL_SPEED = 50;
-        public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
-        public static final Image PADDLE_PICTURE = new Image("https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg",BLOCK_SIZE,BLOCK_SIZE,false,false);
+        public static final String BALL_PICTURE = "https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459";
+        //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
+        public static final String PADDLE_PICTURE = "https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg";
         // some things we need to remember during our game
         private Scene myScene;
         private Timeline myAnimation;
@@ -88,7 +90,7 @@ import java.util.Scanner;
         @Override
         public void start (Stage stage) {
             // attach scene to the stage and display it
-            myScene = setupScene(SIZE, SIZE, BACKGROUND,BALL_PICTURE);
+            myScene = setupScene(SIZE, SIZE, BACKGROUND,new Image(BALL_PICTURE,30,30,false,false));
             stage.setScene(myScene);
             stage.setTitle(TITLE);
             stage.show();
@@ -106,11 +108,11 @@ import java.util.Scanner;
             // create one top level collection to organize the things in the scene
             Group root = new Group();
             // make some shapes, set their properties, and add them to the scene
-            myBall = new Ball(ballImage,0,height/2);
+            myBall = new Ball(ballImage,width/2 - 15,height/2 +60,30,30);
 
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
-            myPaddle = new Paddle(PADDLE_PICTURE,width/2,height/2);
+            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE,BLOCK_SIZE-60,false,false),width/2 - BLOCK_SIZE/2,4 * height/5,BLOCK_SIZE,BLOCK_SIZE-60);
             myBlockSpeedX = BALL_SPEED;
             myBlockSpeedY = BALL_SPEED;
             root.getChildren().add(myPaddle);
@@ -125,8 +127,8 @@ import java.util.Scanner;
             }
             //create boundary that ball cannot pass over
             boundary = new ImageView();
-            boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
-            boundary.setY(4 * height/5);
+            boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),10,false,false));
+            boundary.setY(9 * height/10);
             root.getChildren().add(boundary);
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
