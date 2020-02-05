@@ -2,7 +2,7 @@
 ## NAMEs
 Michael Williams
 
-AP
+Aparimeya Taneja
 
 ### Breakout Variant
 
@@ -45,6 +45,7 @@ LAser Ball- Hits a brick and causes explosion, splash damage to surrounding bric
 
 * " ": Pauses the game
 
+
 ### Something Extra
 Hard Mode
 
@@ -56,5 +57,5 @@ Unlockables - Vanity paddle and ball skins
 
 ### Possible Classes
 
-Ball Class, Paddle class, Brick CLass, Game Class, Physics class
+Ball Class, Paddle class, Brick CLass, Game Class, Physics class, 
 

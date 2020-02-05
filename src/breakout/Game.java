@@ -90,8 +90,7 @@ import javafx.util.Duration;
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
         }
-
-        // Change properties of shapes to animate them
+         // Change properties of shapes to animate them
         void step (double elapsedTime) {
             // get internal values of other classes
 //            Rectangle blockShape = myBall.getShape();
