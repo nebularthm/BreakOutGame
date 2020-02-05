@@ -8,11 +8,10 @@ import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -29,22 +28,22 @@ import javafx.util.Duration;
         public static final int FRAMES_PER_SECOND = 60;
         public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
         public static final Paint BACKGROUND = Color.AZURE;
-        public static final int MOVER_SPEED = 5;
+        public static final int PADDLE_SPEED = 10;
         public static final int BLOCK_SIZE = 30;
         public static final int BLOCK_MIN_SPEED = 10;
         public static final int BLOCK_MAX_SPEED = 100;
         public static final int BLOCK_SPEEDUP_FACTOR = 2;
-        public static final int BALL_SPEED = 5;
+        public static final int BALL_SPEED = 50;
         public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
-
-
+        public static final Image PADDLE_PICTURE = new Image("https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg",BLOCK_SIZE,BLOCK_SIZE,false,false);
         // some things we need to remember during our game
         private Scene myScene;
         private Timeline myAnimation;
         private Paddle myPaddle;
         // TODO: add many blocks
         private Ball myBall;
-        private int myBlockSpeed;
+        private ImageView boundary;
+        private int myBlockSpeedX, myBlockSpeedY;
 
 
         /**
@@ -75,11 +74,18 @@ import javafx.util.Duration;
 
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
-            myPaddle = new Paddle(BLOCK_SIZE/2, BLOCK_SIZE,width/2,height/2);
-            myBlockSpeed = BALL_SPEED;
+            myPaddle = new Paddle(PADDLE_PICTURE,width/2,height/2);
+            myBlockSpeedX = BALL_SPEED;
+            myBlockSpeedY = BALL_SPEED;
             root.getChildren().add(myPaddle);
+
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
+            //create boundary that ball cannot pass over
+            boundary = new ImageView();
+            boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
+            boundary.setY(4 * height/5);
+            root.getChildren().add(boundary);
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -92,37 +98,49 @@ import javafx.util.Duration;
 //            Rectangle moverShape = myPaddle.getShape();
 
             // update attributes
-            myBall.setX(myBall.getX() + myBlockSpeed * elapsedTime);
-            if (myBall.getX() > myScene.getWidth()) {
-                myBall.setX(0);
-                if (myBlockSpeed < BLOCK_MAX_SPEED) {
-                    myBlockSpeed += BLOCK_SPEEDUP_FACTOR;
-                }
+            myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
+            if (myBall.getX() >= myScene.getWidth() || myBall.getX() <= 0 ) {
+               myBlockSpeedX *= -1;
             }
+            myBall.setY(myBall.getY() + myBlockSpeedY * elapsedTime);
+            if (myBall.getY() >= myScene.getHeight() || myBall.getY() <= 0 ) {
+                myBlockSpeedY *= -1;
+            }
+
             // check for collisions TODO: Make  a physics class that handles this, for now I will figure out how to do this later
 //            if (Shape.intersect(myPaddle, myBall).getBoundsInLocal().getWidth() != -1) {
 //                // reset player's position to the start
 //                myPaddle.setX(myScene.getWidth() / 2 - myPaddle.getWidth() / 2);
 //                myPaddle.setY(myScene.getHeight() - myPaddle.getHeight());
 //            }
+            //this is for when the ball hits the boundary
+            if(myBall.getBoundsInParent().intersects(boundary.getBoundsInParent())){
+                myBall.setX(0);
+                myBall.setY(myScene.getHeight()/2);
+            }
+            //if you hit the paddle, bounce as if you hit the wall
+            if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
+                myBlockSpeedY *= -1;
+                myBlockSpeedX *= -1;
+            }
             // TODO: check for win and, if true, pause the animation
         }
 
         // What to do each time a key is pressed
         private void handleKeyInput (KeyCode code) {
             // move player
-            Rectangle moverShape = myPaddle;
+            ImageView moverShape = myPaddle;
             if (code == KeyCode.RIGHT) {
-                moverShape.setX(moverShape.getX() + MOVER_SPEED);
+                moverShape.setX(moverShape.getX() + PADDLE_SPEED);
             }
             else if (code == KeyCode.LEFT) {
-                moverShape.setX(moverShape.getX() - MOVER_SPEED);
+                moverShape.setX(moverShape.getX() - PADDLE_SPEED);
             }
             else if (code == KeyCode.UP) {
-                moverShape.setY(moverShape.getY() - MOVER_SPEED);
+                moverShape.setY(moverShape.getY() - PADDLE_SPEED);
             }
             else if (code == KeyCode.DOWN) {
-                moverShape.setY(moverShape.getY() + MOVER_SPEED);
+                moverShape.setY(moverShape.getY() + PADDLE_SPEED);
             }
             // pause/restart animation
             if (code == KeyCode.SPACE) {
