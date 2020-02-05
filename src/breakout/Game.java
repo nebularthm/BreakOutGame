@@ -151,6 +151,13 @@ import javafx.util.Duration;
                     myAnimation.play();
                 }
             }
+            //when you press r this completely resets ball and paddle
+            if(code == KeyCode.R){
+                myBall.setX(0);
+                myBall.setY(myScene.getHeight()/2);
+                myPaddle.setX(myScene.getWidth()/2);
+                myPaddle.setY(myScene.getHeight()/2);
+            }
         }
         public static void main (String[] args) {
             launch(args);

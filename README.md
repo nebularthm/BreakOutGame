@@ -14,7 +14,7 @@ Finish Date:
 Hours Spent:
 
 ### Resources Used
-
+https://stackoverflow.com/questions/27878421/intersect-of-imageviews-in-javafx
 
 ### Running the Program
 
