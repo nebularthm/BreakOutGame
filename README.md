@@ -15,7 +15,7 @@ Hours Spent:
 
 ### Resources Used
 https://stackoverflow.com/questions/27878421/intersect-of-imageviews-in-javafx
-
+https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/progress.htm
 ### Running the Program
 
 Main class:

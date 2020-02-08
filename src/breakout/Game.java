@@ -7,9 +7,12 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
@@ -42,7 +45,8 @@ import java.util.Scanner;
         public static final int BALL_SPEED = 50;
         public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
         public static final Image PADDLE_PICTURE = new Image("https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg",BLOCK_SIZE,BLOCK_SIZE,false,false);
-        // some things we need to remember during our game
+    private static final double BALL_PENALTY = 0.25 ;
+    // some things we need to remember during our game
         private Scene myScene;
         private Timeline myAnimation;
         private Paddle myPaddle;
@@ -51,6 +55,9 @@ import java.util.Scanner;
         private ImageView boundary;
         private int myBlockSpeedX, myBlockSpeedY;
         private Bricks [][] level;//this is a 2D array of our bricks
+        private ProgressBar healthBar;
+        private HBox healthBarLabel;
+        private Label hLabel;
 
     /**
      * this method constructs the grid of bricks by reading the config file for a level
@@ -128,6 +135,16 @@ import java.util.Scanner;
             boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
             boundary.setY(4 * height/5);
             root.getChildren().add(boundary);
+            healthBar = new ProgressBar(1);
+            healthBarLabel = new HBox();//https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/progress.htm I am gonna use a ProgressBar to represent the health we have
+//            healthBarLabel.setSpacing(5);
+//            healthBarLabel.setLayoutX(0);
+//            healthBarLabel.setLayoutY(7 * height/8);
+//            healthBarLabel.getChildren().add(healthBar);
+//            healthBarLabel.getChildren()
+            hLabel = new Label("Health",healthBar);
+            hLabel.setLayoutY(7 * height/8);
+            root.getChildren().add(hLabel);
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -161,6 +178,12 @@ import java.util.Scanner;
             if(myBall.getBoundsInParent().intersects(boundary.getBoundsInParent())){
                 myBall.setX(0);
                 myBall.setY(myScene.getHeight()/2);
+                healthBar.setProgress(healthBar.getProgress() - BALL_PENALTY);
+                hLabel = new Label("Health", healthBar);
+            }
+            if(healthBar.getProgress() == 0){
+                System.out.println("You lost the game and you suck");
+                myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
