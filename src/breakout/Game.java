@@ -234,6 +234,10 @@ import java.util.Scanner;
                 myPaddle.setX(myScene.getWidth()/2);
                 myPaddle.setY(myScene.getHeight()/2);
             }
+            if(code == KeyCode.L){//This block of code gives the player full health on the presing of the L key 
+                healthBar.setProgress(1);
+                hLabel = new Label("Health", healthBar);
+            }
         }
         public static void main (String[] args) {
             launch(args);
