@@ -58,6 +58,8 @@ import java.util.Scanner;
         private ProgressBar healthBar;
         private HBox healthBarLabel;
         private Label hLabel;
+        private Label scoreTrack;
+        private int myScore;
 
     /**
      * this method constructs the grid of bricks by reading the config file for a level
@@ -137,14 +139,15 @@ import java.util.Scanner;
             root.getChildren().add(boundary);
             healthBar = new ProgressBar(1);
             healthBarLabel = new HBox();//https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/progress.htm I am gonna use a ProgressBar to represent the health we have
-//            healthBarLabel.setSpacing(5);
-//            healthBarLabel.setLayoutX(0);
-//            healthBarLabel.setLayoutY(7 * height/8);
-//            healthBarLabel.getChildren().add(healthBar);
-//            healthBarLabel.getChildren()
+
             hLabel = new Label("Health",healthBar);
             hLabel.setLayoutY(7 * height/8);
             root.getChildren().add(hLabel);
+            myScore = 0;
+            scoreTrack = new Label("Score: " + myScore + "0");
+            scoreTrack.setLayoutY(7*height/8);
+            scoreTrack.setLayoutX(width * 4/5);
+            root.getChildren().add(scoreTrack);
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -196,6 +199,14 @@ import java.util.Scanner;
                     if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                         myBlockSpeedY *= -1;
                         myBlockSpeedX *= -1;
+                        brick.updateDamage();
+                    }
+                }
+            }
+            for(Bricks [] brickies:level){
+                for(Bricks brick: brickies){
+                    if(brick.getDamge() == true){
+                       brick = null;
                     }
                 }
             }

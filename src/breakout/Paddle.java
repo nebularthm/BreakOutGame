@@ -10,13 +10,11 @@ import javafx.scene.shape.Rectangle;
 public class Paddle extends ImageView {
     private double height;
     private double width;
-    public Paddle(Image paddle, double x, double y,double width, double height){
+    public Paddle(Image paddle, double x, double y){
         this.setImage(paddle);
         this.setX(x);
         this.setY(y);
         this.setId("paddle");
-        this.height = height;
-        this.width = width;
 
     }
 

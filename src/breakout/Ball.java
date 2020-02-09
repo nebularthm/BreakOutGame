@@ -16,13 +16,11 @@ private double ballSpeed;
      * @param x x posiiton
      * @param y y position
      */
-    public Ball(Image picture, double x, double y, double width, double height){
+    public Ball(Image picture, double x, double y){
     this.setImage(picture);
     this.setX(x);
     this.setY(y);
     this.setId("ball_is_life");
-        this.height = height;
-        this.width = width;
 }
 public void setSpeed(double speed){
     ballSpeed = speed;
