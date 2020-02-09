@@ -97,7 +97,7 @@ import java.util.Scanner;
         @Override
         public void start (Stage stage) {
             // attach scene to the stage and display it
-            myScene = setupScene(SIZE, SIZE, BACKGROUND,BALL_PICTURE);
+            myScene = setupScene(SIZE, SIZE, BACKGROUND);
             stage.setScene(myScene);
             stage.setTitle(TITLE);
             stage.show();
@@ -111,11 +111,11 @@ import java.util.Scanner;
 
 
         // Create the game's "scene": what shapes will be in the game and their starting properties
-        Scene setupScene (int width, int height, Paint background, Image ballImage) {
+        Scene setupScene (int width, int height, Paint background) {
             // create one top level collection to organize the things in the scene
             Group root = new Group();
             // make some shapes, set their properties, and add them to the scene
-            myBall = new Ball(ballImage,0,height/2);
+            myBall = new Ball(BALL_PICTURE,0,height/2);
 
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);

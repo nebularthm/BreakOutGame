@@ -28,7 +28,7 @@ class GameTest extends DukeApplicationTest {
 
     @Override
     public void start (Stage stage) {
-        myScene = myGame.setupScene(Game.SIZE, Game.SIZE, Game.BACKGROUND,new Image(Game.BALL_PICTURE,30,30,false,false));
+        myScene = myGame.setupScene(Game.SIZE, Game.SIZE, Game.BACKGROUND);
         stage.setScene(myScene);
         stage.show();
         stage.setTitle(myGame.TITLE);
