@@ -177,8 +177,8 @@ import java.util.Scanner;
             scoreTrack.setLayoutY(7*height/8);
             scoreTrack.setLayoutX(width * 4/5);
             root.getChildren().add(scoreTrack);
-            bigpaddie = new PowerUp(BIGGERPADDLE, 0, 0);
-            root.getChildren().add(bigpaddie);
+
+
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -193,12 +193,13 @@ import java.util.Scanner;
 //            Rectangle moverShape = myPaddle.getShape();
 
             // update attributes
-            if(isPowerUP)
-                bigpaddie.setY(bigpaddie.getY() + 50 *elapsedTime) ;
-            if(bigpaddie.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
+            if(isPowerUP) {
+                bigpaddie.setY(bigpaddie.getY() + 50 * elapsedTime);
+                if (bigpaddie.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
                     myPaddle.setFitWidth(myScene.getWidth());
                     isPowerUP = false;
                     root.getChildren().remove(bigpaddie);
+                }
             }
 
             myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
@@ -256,6 +257,8 @@ import java.util.Scanner;
                         root.getChildren().remove(brick);
                         if(isPowerUP == false) {
                             isPowerUP = true;
+                            bigpaddie = new PowerUp(BIGGERPADDLE, brick.getX(), brick.getY());
+                            root.getChildren().add(bigpaddie);
                         }
                     }
                 }
@@ -298,6 +301,14 @@ import java.util.Scanner;
             if(code == KeyCode.L){//This block of code gives the player full health on the presing of the L key
                 healthBar.setProgress(1);
                 hLabel = new Label("Health", healthBar);
+            }
+            if(code == KeyCode.P){
+                isPowerUP = true;
+                bigpaddie = new PowerUp(BIGGERPADDLE, 0, 0);
+                root.getChildren().add(bigpaddie);
+            }
+            if(code == KeyCode.B){
+                myBall.setFitWidth(myBall.getWidth() * 2);
             }
         }
         public static void main (String[] args) {
