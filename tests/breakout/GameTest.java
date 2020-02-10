@@ -52,8 +52,9 @@ class GameTest extends DukeApplicationTest {
         stage.setTitle(myGame.TITLE);
         myPaddle = lookup("#paddle").query();
         myBall = lookup("#ball_is_life").query();
-        hLabel = lookup("hLabel").query();
-        scoreTrack = lookup("scoreTrack").query();
+        hLabel = lookup("#hLabel").query();
+        scoreTrack = lookup("#scoreTrack").query();
+
 
     }
 
@@ -68,8 +69,7 @@ class GameTest extends DukeApplicationTest {
     public void testBallInitialPosition () {
         assertEquals(Game.SIZE/2 - 15, myBall.getX());
         assertEquals(Game.SIZE/2 + 60, myBall.getY());
-        assertEquals(30, myBall.getWidth());
-        assertEquals(30, myBall.getHeight());
+
         assertEquals(50,myBall.getBallSpeed());
     }/*
     @Test
@@ -87,9 +87,9 @@ class GameTest extends DukeApplicationTest {
         myPaddle.setX(myScene.getWidth() / 2);
         myPaddle.setY(myScene.getHeight() / 2);
         // move it up one step by "pressing" the up arrow
-            // PAUSE: not typically recommended in tests
+        // PAUSE: not typically recommended in tests
         press(myScene, KeyCode.LEFT);
-           // PAUSE: but useful when debugging to verify what is happening
+        // PAUSE: but useful when debugging to verify what is happening
         // then check its position has changed properly
         assertEquals(190, myPaddle.getX());
         assertEquals(200, myPaddle.getY());
@@ -104,4 +104,3 @@ class GameTest extends DukeApplicationTest {
 
 
 }
-
