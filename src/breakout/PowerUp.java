@@ -8,5 +8,6 @@ public class PowerUp extends ImageView {
         this.setImage(powerImage);
         this.setX(x);
         this.setY(y);
+
     }
 }

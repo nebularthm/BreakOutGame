@@ -5,6 +5,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -19,8 +20,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -46,9 +50,12 @@ import java.util.Scanner;
         public static final int BLOCK_SPEEDUP_FACTOR = 2;
         public static final int BRICK_AMOUNT = 5;
         public static final int BALL_SPEED = 50;
-        public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
-        public static final Image PADDLE_PICTURE = new Image("https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg",BLOCK_SIZE,BLOCK_SIZE,false,false);
-        public static final Image BIGGERPADDLE = new Image("https://i.pinimg.com/originals/b4/92/d5/b492d594465b29bcbe7ff840fa18c896.png",BLOCK_SIZE,BLOCK_SIZE,false,false);
+
+    public static final String BALL_PICTURE = "https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459";
+
+    public static final String PADDLE_PICTURE = "https://docs.microsoft.com/en-us/windows/uwp/get-started/images/monogame-tutorial-1.png";
+    // some things we need to remember during our game
+    public static final String BIGGERPADDLE = "https://i.pinimg.com/originals/b4/92/d5/b492d594465b29bcbe7ff840fa18c896.png";
         private static final double BALL_PENALTY = 0.25 ;
     // some things we need to remember during our game
         private Scene myScene;
@@ -70,6 +77,7 @@ import java.util.Scanner;
         private PowerUp bigpaddie;
         private Group root;
         private boolean isPowerUP = false;
+        private Menu myMenu;
 
     /**
      * this code is from stack, essentially converts
@@ -141,11 +149,12 @@ import java.util.Scanner;
             // create one top level collection to organize the things in the scene
             root = new Group();
             // make some shapes, set their properties, and add them to the scene
-            myBall = new Ball(BALL_PICTURE,0,height/2);
+            Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
+            myBall = new Ball(ballImage,width/2 - 15,height/2 +60);
 
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
-            myPaddle = new Paddle(PADDLE_PICTURE,width/2,height/2);
+            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE,BLOCK_SIZE-250,false,false),width/2 - BLOCK_SIZE/2,4 * height/5);
             myBlockSpeedX = BALL_SPEED;
             myBlockSpeedY = BALL_SPEED;
             root.getChildren().add(myPaddle);
@@ -180,6 +189,14 @@ import java.util.Scanner;
             scoreTrack.setLayoutX(width * 4/5);
             scoreTrack.setId("scoreTrack");
             root.getChildren().add(scoreTrack);
+            BufferedImage img = null;
+            try {
+                img = ImageIO.read(new File(Main.class.getClassLoader().getResource("Images/gameover.png").getFile()));
+            } catch (IOException e) {
+            }
+            ;
+            myMenu = new Menu(SwingFXUtils.toFXImage(img, null ),SIZE/2,SIZE/2);
+
 
 
             // respond to
@@ -199,7 +216,7 @@ import java.util.Scanner;
             if(isPowerUP) {
                 bigpaddie.setY(bigpaddie.getY() + 50 * elapsedTime);
                 if (bigpaddie.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
-                    myPaddle.setFitWidth(myScene.getWidth());
+                    myPaddle.setFitWidth(myScene.getWidth()-50);
                     isPowerUP = false;
                     root.getChildren().remove(bigpaddie);
                 }
@@ -234,14 +251,16 @@ import java.util.Scanner;
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
                 myBlockSpeedY *= -1;
-                myBlockSpeedX *= -1;
+                myBlockSpeedX *= 1;
+
             }
             //check for case when you hit a brick
             for(ArrayList<Bricks> brickies: levelAsList){
                 for(Bricks brick: brickies){
                     if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                         myBlockSpeedY *= -1;
-                        myBlockSpeedX *= -1;
+                        myBlockSpeedX *= 1;
+
                         brick.updateDamage();
                         myScore += 10;
                         scoreText.setText(myScore + "0");
@@ -260,7 +279,8 @@ import java.util.Scanner;
                         root.getChildren().remove(brick);
                         if(isPowerUP == false) {
                             isPowerUP = true;
-                            bigpaddie = new PowerUp(BIGGERPADDLE, brick.getX(), brick.getY());
+
+                            bigpaddie = new PowerUp(new Image(BIGGERPADDLE,30,30,false,false), brick.getX(), brick.getY());
                             root.getChildren().add(bigpaddie);
                         }
                     }
@@ -279,12 +299,7 @@ import java.util.Scanner;
             else if (code == KeyCode.LEFT) {
                 moverShape.setX(moverShape.getX() - PADDLE_SPEED);
             }
-            else if (code == KeyCode.UP) {
-                moverShape.setY(moverShape.getY() - PADDLE_SPEED);
-            }
-            else if (code == KeyCode.DOWN) {
-                moverShape.setY(moverShape.getY() + PADDLE_SPEED);
-            }
+
             // pause/restart animation
             if (code == KeyCode.SPACE) {
                 if (myAnimation.getStatus() == Animation.Status.RUNNING) {
@@ -307,7 +322,7 @@ import java.util.Scanner;
             }
             if(code == KeyCode.P){
                 isPowerUP = true;
-                bigpaddie = new PowerUp(BIGGERPADDLE, 0, 0);
+                bigpaddie = new PowerUp(new Image(BIGGERPADDLE,30,30,false,false), 0, 0);
                 root.getChildren().add(bigpaddie);
             }
             if(code == KeyCode.B){
