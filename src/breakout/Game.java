@@ -48,7 +48,8 @@ import java.util.Scanner;
         public static final int BALL_SPEED = 50;
         public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
         public static final Image PADDLE_PICTURE = new Image("https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg",BLOCK_SIZE,BLOCK_SIZE,false,false);
-    private static final double BALL_PENALTY = 0.25 ;
+        public static final Image BIGGERPADDLE = new Image("https://i.pinimg.com/originals/b4/92/d5/b492d594465b29bcbe7ff840fa18c896.png",BLOCK_SIZE,BLOCK_SIZE,false,false);
+        private static final double BALL_PENALTY = 0.25 ;
     // some things we need to remember during our game
         private Scene myScene;
         private Timeline myAnimation;
@@ -66,6 +67,9 @@ import java.util.Scanner;
         private Text scoreText;
         private ArrayList<ArrayList<Bricks>> levelAsList;
         private boolean winCon = false;
+        private PowerUp bigpaddie;
+        private Group root;
+        private boolean isPowerUP = false;
 
     /**
      * this code is from stack, essentially converts
@@ -135,7 +139,7 @@ import java.util.Scanner;
         // Create the game's "scene": what shapes will be in the game and their starting properties
         Scene setupScene (int width, int height, Paint background) {
             // create one top level collection to organize the things in the scene
-            Group root = new Group();
+            root = new Group();
             // make some shapes, set their properties, and add them to the scene
             myBall = new Ball(BALL_PICTURE,0,height/2);
 
@@ -153,6 +157,7 @@ import java.util.Scanner;
             for(ArrayList<Bricks> brickies:levelAsList){
                 for(Bricks brick: brickies){
                     root.getChildren().add(brick);
+
                 }
             }
             //create boundary that ball cannot pass over
@@ -172,6 +177,8 @@ import java.util.Scanner;
             scoreTrack.setLayoutY(7*height/8);
             scoreTrack.setLayoutX(width * 4/5);
             root.getChildren().add(scoreTrack);
+            bigpaddie = new PowerUp(BIGGERPADDLE, 0, 0);
+            root.getChildren().add(bigpaddie);
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -186,6 +193,14 @@ import java.util.Scanner;
 //            Rectangle moverShape = myPaddle.getShape();
 
             // update attributes
+            if(isPowerUP)
+                bigpaddie.setY(bigpaddie.getY() + 50 *elapsedTime) ;
+            if(bigpaddie.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
+                    myPaddle.setFitWidth(myScene.getWidth());
+                    isPowerUP = false;
+                    root.getChildren().remove(bigpaddie);
+            }
+
             myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
             if (myBall.getX() >= myScene.getWidth() || myBall.getX() <= 0 ) {
                myBlockSpeedX *= -1;
@@ -227,6 +242,7 @@ import java.util.Scanner;
                         myScore += 10;
                         scoreText.setText(myScore + "0");
                         scoreTrack = new Label("Score: ",scoreText);
+
                     }
                 }
             }
@@ -237,6 +253,10 @@ import java.util.Scanner;
                     if(brick.getDamge()){
                         brick.setImage(null);
                         itr.remove();
+                        root.getChildren().remove(brick);
+                        if(isPowerUP == false) {
+                            isPowerUP = true;
+                        }
                     }
                 }
             }

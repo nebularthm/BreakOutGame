@@ -21,4 +21,5 @@ public class Bricks extends ImageView {
     public boolean getDamge(){
         return damaged;
     }
+
 }
