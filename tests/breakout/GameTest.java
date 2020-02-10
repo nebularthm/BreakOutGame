@@ -1,14 +1,20 @@
 package breakout;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javafx.animation.Timeline;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import util.DukeApplicationTest;
@@ -25,6 +31,17 @@ class GameTest extends DukeApplicationTest {
     private Paddle myPaddle;
     // TODO: add many blocks
     private Ball myBall;
+    private ImageView boundary;
+    private int myBlockSpeedX, myBlockSpeedY;
+    private Bricks [][] level;//this is a 2D array of our bricks
+    private ProgressBar healthBar;
+    private Label hLabel;
+    private Label scoreTrack;
+    private int myScore;
+    private Text scoreText;
+    private ArrayList<ArrayList<Bricks>> levelAsList;
+    private boolean winCon = false;
+    private PowerUp bigpaddie;
 
     @Override
     public void start (Stage stage) {
@@ -34,6 +51,8 @@ class GameTest extends DukeApplicationTest {
         stage.setTitle(myGame.TITLE);
         myPaddle = lookup("#paddle").query();
         myBall = lookup("#ball_is_life").query();
+        hLabel = lookup("hLabel").query();
+        scoreTrack = lookup("scoreTrack").query();
 
     }
 
@@ -73,6 +92,13 @@ class GameTest extends DukeApplicationTest {
         // then check its position has changed properly
         assertEquals(190, myPaddle.getX());
         assertEquals(200, myPaddle.getY());
+    }
+    @Test
+    public void testHealthAndScore(){
+        assertEquals(7 * Game.SIZE/8, hLabel.getLayoutY());
+        assertEquals(0,hLabel.getLayoutX());
+        assertEquals(Game.SIZE * 4/5,scoreTrack.getLayoutX());
+        assertEquals(Game.SIZE* 7/8, scoreTrack.getLayoutY());
     }
 
 }

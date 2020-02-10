@@ -164,18 +164,21 @@ import java.util.Scanner;
             boundary = new ImageView();
             boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
             boundary.setY(4 * height/5);
+            boundary.setId("boundary");
             root.getChildren().add(boundary);
             healthBar = new ProgressBar(1);
             healthBarLabel = new HBox();//https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/progress.htm I am gonna use a ProgressBar to represent the health we have
 
             hLabel = new Label("Health",healthBar);
             hLabel.setLayoutY(7 * height/8);
+            hLabel.setId("hLabel");
             root.getChildren().add(hLabel);
             myScore = 0;
             scoreText = new Text(myScore + "0");
             scoreTrack = new Label("Score: ", scoreText);
             scoreTrack.setLayoutY(7*height/8);
             scoreTrack.setLayoutX(width * 4/5);
+            scoreTrack.setId("scoreTrack");
             root.getChildren().add(scoreTrack);
 
 
