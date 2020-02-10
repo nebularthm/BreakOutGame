@@ -305,7 +305,7 @@ import java.util.Scanner;
                 moverShape.setY(moverShape.getY() - PADDLE_SPEED);
             }
             else if (code == KeyCode.DOWN) {
-                moverShape.setX(moverShape.getY() - PADDLE_SPEED);
+                moverShape.setY(moverShape.getY() + PADDLE_SPEED);
             }
 
 

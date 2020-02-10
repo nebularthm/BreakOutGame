@@ -62,8 +62,8 @@ class GameTest extends DukeApplicationTest {
     public void testPaddleInitialPosition () {
         assertEquals(Game.SIZE/2 - Game.BLOCK_SIZE/2, myPaddle.getX());
         assertEquals(4 * Game.SIZE/5, myPaddle.getY());
-        assertEquals(Game.BLOCK_SIZE, myPaddle.getWidth());
-        assertEquals(Game.BLOCK_SIZE -60, myPaddle.getHeight());
+        assertEquals(Game.BLOCK_SIZE, myPaddle.getFitWidth());
+        assertEquals(Game.BLOCK_SIZE -60, myPaddle.getFitWidth());
     }
     @Test
     public void testBallInitialPosition () {
