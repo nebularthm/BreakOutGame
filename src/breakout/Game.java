@@ -154,7 +154,7 @@ import java.util.Scanner;
 
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
-            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE,BLOCK_SIZE-250,false,false),width/2 - BLOCK_SIZE/2,4 * height/5);
+            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
             myBlockSpeedX = BALL_SPEED;
             myBlockSpeedY = BALL_SPEED;
             root.getChildren().add(myPaddle);
@@ -193,8 +193,9 @@ import java.util.Scanner;
             try {
                 img = ImageIO.read(new File(Main.class.getClassLoader().getResource("Images/gameover.png").getFile()));
             } catch (IOException e) {
+                System.out.print(e);
             }
-            ;
+
             myMenu = new Menu(SwingFXUtils.toFXImage(img, null ),SIZE/2,SIZE/2);
 
 
@@ -246,6 +247,7 @@ import java.util.Scanner;
             }
             if(healthBar.getProgress() == 0){//this is if you run out of health
                 System.out.println("You lost the game and you suck");
+                
                 myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall
