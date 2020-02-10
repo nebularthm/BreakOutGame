@@ -235,6 +235,7 @@ import java.util.Scanner;
                 while(itr.hasNext()){
                     Bricks brick = itr.next();
                     if(brick.getDamge()){
+                        brick.setImage(null);
                         itr.remove();
                     }
                 }
