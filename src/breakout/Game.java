@@ -5,25 +5,26 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Scanner;
-
-
 
 
 /**
@@ -32,24 +33,24 @@ import java.util.Scanner;
      * @author Robert C. Duvall
      */
     public class Game extends Application {
-
         public static final String TITLE = "Super Breakout";
         public static final String WINNING_MESSAGE = "WINNER!";
-        public static final int SIZE = 800;
+        public static final int SIZE = 400;
         public static final int FRAMES_PER_SECOND = 60;
         public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
         public static final Paint BACKGROUND = Color.AZURE;
-        public static final int PADDLE_SPEED = 1;
-        public static final int BLOCK_SIZE = 300;
+        public static final int PADDLE_SPEED = 10;
+        public static final int BLOCK_SIZE = 30;
         public static final int BLOCK_MIN_SPEED = 10;
         public static final int BLOCK_MAX_SPEED = 100;
         public static final int BLOCK_SPEEDUP_FACTOR = 2;
         public static final int BRICK_AMOUNT = 5;
-        public static final int BALL_SPEED = 200;
-        public static final String BALL_PICTURE = "https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459";
-        //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
-        public static final String PADDLE_PICTURE = "https://docs.microsoft.com/en-us/windows/uwp/get-started/images/monogame-tutorial-1.png";
-        // some things we need to remember during our game
+        public static final int BALL_SPEED = 50;
+        public static final Image BALL_PICTURE = new Image("https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459",30,30,false,false); //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
+        public static final Image PADDLE_PICTURE = new Image("https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg",BLOCK_SIZE,BLOCK_SIZE,false,false);
+        public static final Image BIGGERPADDLE = new Image("https://i.pinimg.com/originals/b4/92/d5/b492d594465b29bcbe7ff840fa18c896.png",BLOCK_SIZE,BLOCK_SIZE,false,false);
+        private static final double BALL_PENALTY = 0.25 ;
+    // some things we need to remember during our game
         private Scene myScene;
         private Timeline myAnimation;
         private Paddle myPaddle;
@@ -58,8 +59,34 @@ import java.util.Scanner;
         private ImageView boundary;
         private int myBlockSpeedX, myBlockSpeedY;
         private Bricks [][] level;//this is a 2D array of our bricks
-        private Menu myMenu;
+        private ProgressBar healthBar;
+        private HBox healthBarLabel;
+        private Label hLabel;
+        private Label scoreTrack;
+        private int myScore;
+        private Text scoreText;
+        private ArrayList<ArrayList<Bricks>> levelAsList;
+        private boolean winCon = false;
+        private PowerUp bigpaddie;
+        private Group root;
+        private boolean isPowerUP = false;
 
+    /**
+     * this code is from stack, essentially converts
+     * @param twoDArray 2d array of bricks
+     * @return
+     */
+    public  ArrayList<ArrayList<Bricks>> twoDArrayToList(Bricks [][] twoDArray) {
+        ArrayList<ArrayList<Bricks>> list = new ArrayList<>();
+        for (Bricks [] array : twoDArray) {
+            ArrayList<Bricks> tempList = new ArrayList<>();
+            for(Bricks brick: array){
+                tempList.add(brick);
+            }
+            list.add(tempList);
+        }
+        return list;
+    }
     /**
      * this method constructs the grid of bricks by reading the config file for a level
      * @param levelSource string representing filename
@@ -96,7 +123,7 @@ import java.util.Scanner;
         @Override
         public void start (Stage stage) {
             // attach scene to the stage and display it
-            myScene = setupScene(SIZE, SIZE, BACKGROUND,new Image(BALL_PICTURE,30,30,false,false));
+            myScene = setupScene(SIZE, SIZE, BACKGROUND);
             stage.setScene(myScene);
             stage.setTitle(TITLE);
             stage.show();
@@ -110,15 +137,15 @@ import java.util.Scanner;
 
 
         // Create the game's "scene": what shapes will be in the game and their starting properties
-        Scene setupScene (int width, int height, Paint background, Image ballImage) {
+        Scene setupScene (int width, int height, Paint background) {
             // create one top level collection to organize the things in the scene
-            Group root = new Group();
+            root = new Group();
             // make some shapes, set their properties, and add them to the scene
-            myBall = new Ball(ballImage,width/2 - 15,height/2 +60,30,30);
+            myBall = new Ball(BALL_PICTURE,0,height/2);
 
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
-            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE,BLOCK_SIZE-250,false,false),width/2 - BLOCK_SIZE/2,4 * height/5,BLOCK_SIZE,BLOCK_SIZE-60);
+            myPaddle = new Paddle(PADDLE_PICTURE,width/2,height/2);
             myBlockSpeedX = BALL_SPEED;
             myBlockSpeedY = BALL_SPEED;
             root.getChildren().add(myPaddle);
@@ -126,29 +153,41 @@ import java.util.Scanner;
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
             level = levelReader("data/tutorial.txt",width,height);
-            for(Bricks [] brickies:level){
+            levelAsList = twoDArrayToList(level);
+            for(ArrayList<Bricks> brickies:levelAsList){
                 for(Bricks brick: brickies){
                     root.getChildren().add(brick);
+
                 }
             }
             //create boundary that ball cannot pass over
             boundary = new ImageView();
-            boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),10,false,false));
-            boundary.setY(9 * height/10);
+            boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
+            boundary.setY(4 * height/5);
+            boundary.setId("boundary");
             root.getChildren().add(boundary);
-            BufferedImage img = null;
-            try {
-                img = ImageIO.read(new File(Main.class.getClassLoader().getResource("Images/gameover.png").getFile()));
-            } catch (IOException e) {
-            }
-            ;
-            myMenu = new Menu(SwingFXUtils.toFXImage(img, null ),SIZE/2,SIZE/2);
+            healthBar = new ProgressBar(1);
+            healthBarLabel = new HBox();//https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/progress.htm I am gonna use a ProgressBar to represent the health we have
+
+            hLabel = new Label("Health",healthBar);
+            hLabel.setLayoutY(7 * height/8);
+            hLabel.setId("hLabel");
+            root.getChildren().add(hLabel);
+            myScore = 0;
+            scoreText = new Text(myScore + "0");
+            scoreTrack = new Label("Score: ", scoreText);
+            scoreTrack.setLayoutY(7*height/8);
+            scoreTrack.setLayoutX(width * 4/5);
+            scoreTrack.setId("scoreTrack");
+            root.getChildren().add(scoreTrack);
+
 
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
         }
-         // Change properties of shapes to animate them
+
+        // Change properties of shapes to animate them
         void step (double elapsedTime) {
 
 
@@ -157,6 +196,15 @@ import java.util.Scanner;
 //            Rectangle moverShape = myPaddle.getShape();
 
             // update attributes
+            if(isPowerUP) {
+                bigpaddie.setY(bigpaddie.getY() + 50 * elapsedTime);
+                if (bigpaddie.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
+                    myPaddle.setFitWidth(myScene.getWidth());
+                    isPowerUP = false;
+                    root.getChildren().remove(bigpaddie);
+                }
+            }
+
             myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
             if (myBall.getX() >= myScene.getWidth() || myBall.getX() <= 0 ) {
                myBlockSpeedX *= -1;
@@ -167,29 +215,54 @@ import java.util.Scanner;
             }
 
             // check for collisions TODO: Make  a physics class that handles this, for now I will figure out how to do this later
-             //            if (Shape.intersect(myPaddle, myBall).getBoundsInLocal().getWidth() != -1) {
-            //                // reset player's position to the start
-            //                myPaddle.setX(myScene.getWidth() / 2 - myPaddle.getWidth() / 2);
-            //                myPaddle.setY(myScene.getHeight() - myPaddle.getHeight());
-            //            }
+//            if (Shape.intersect(myPaddle, myBall).getBoundsInLocal().getWidth() != -1) {
+//                // reset player's position to the start
+//                myPaddle.setX(myScene.getWidth() / 2 - myPaddle.getWidth() / 2);
+//                myPaddle.setY(myScene.getHeight() - myPaddle.getHeight());
+//            }
             //this is for when the ball hits the boundary
             if(myBall.getBoundsInParent().intersects(boundary.getBoundsInParent())){
-                myBall.setX(SIZE/2);
+                myBall.setX(0);
                 myBall.setY(myScene.getHeight()/2);
-                myBlockSpeedX = 0;
-                myBlockSpeedY = 0;
+                healthBar.setProgress(healthBar.getProgress() - BALL_PENALTY);
+                hLabel = new Label("Health", healthBar);
+            }
+            if(healthBar.getProgress() == 0){//this is if you run out of health
+                System.out.println("You lost the game and you suck");
+                myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
                 myBlockSpeedY *= -1;
-                myBlockSpeedX *= 1;
+                myBlockSpeedX *= -1;
             }
             //check for case when you hit a brick
-            for(Bricks [] brickies:level){
+            for(ArrayList<Bricks> brickies: levelAsList){
                 for(Bricks brick: brickies){
                     if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                         myBlockSpeedY *= -1;
-                        myBlockSpeedX *= 1;
+                        myBlockSpeedX *= -1;
+                        brick.updateDamage();
+                        myScore += 10;
+                        scoreText.setText(myScore + "0");
+                        scoreTrack = new Label("Score: ",scoreText);
+
+                    }
+                }
+            }
+            for(ArrayList<Bricks> brickies:levelAsList){
+                Iterator<Bricks> itr = brickies.iterator();
+                while(itr.hasNext()){
+                    Bricks brick = itr.next();
+                    if(brick.getDamge()){
+                        brick.setImage(null);
+                        itr.remove();
+                        root.getChildren().remove(brick);
+                        if(isPowerUP == false) {
+                            isPowerUP = true;
+                            bigpaddie = new PowerUp(BIGGERPADDLE, brick.getX(), brick.getY());
+                            root.getChildren().add(bigpaddie);
+                        }
                     }
                 }
             }
@@ -201,25 +274,17 @@ import java.util.Scanner;
             // move player
             ImageView moverShape = myPaddle;
             if (code == KeyCode.RIGHT) {
-                for (int i = 0; i<10;i++){
-
-                    moverShape.setX(moverShape.getX() + PADDLE_SPEED);
-
-                }
+                moverShape.setX(moverShape.getX() + PADDLE_SPEED);
             }
             else if (code == KeyCode.LEFT) {
-                for (int i = 0; i<10;i++){
-
-                    moverShape.setX(moverShape.getX() - PADDLE_SPEED);
-
-                }
+                moverShape.setX(moverShape.getX() - PADDLE_SPEED);
             }
-           /* else if (code == KeyCode.UP) {
+            else if (code == KeyCode.UP) {
                 moverShape.setY(moverShape.getY() - PADDLE_SPEED);
             }
             else if (code == KeyCode.DOWN) {
                 moverShape.setY(moverShape.getY() + PADDLE_SPEED);
-            } */
+            }
             // pause/restart animation
             if (code == KeyCode.SPACE) {
                 if (myAnimation.getStatus() == Animation.Status.RUNNING) {
@@ -230,13 +295,24 @@ import java.util.Scanner;
                 }
             }
             //when you press r this completely resets ball and paddle
-            else if(code == KeyCode.R){
+            if(code == KeyCode.R){
                 myBall.setX(0);
                 myBall.setY(myScene.getHeight()/2);
                 myPaddle.setX(myScene.getWidth()/2);
                 myPaddle.setY(myScene.getHeight()/2);
             }
-
+            if(code == KeyCode.L){//This block of code gives the player full health on the presing of the L key
+                healthBar.setProgress(1);
+                hLabel = new Label("Health", healthBar);
+            }
+            if(code == KeyCode.P){
+                isPowerUP = true;
+                bigpaddie = new PowerUp(BIGGERPADDLE, 0, 0);
+                root.getChildren().add(bigpaddie);
+            }
+            if(code == KeyCode.B){
+                myBall.setFitWidth(myBall.getWidth() * 2);
+            }
         }
         public static void main (String[] args) {
             launch(args);

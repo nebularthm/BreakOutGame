@@ -9,9 +9,17 @@ import javafx.scene.image.ImageView;
  * The game will use an array of brick objectts to poplate the top portion of the screen
  */
 public class Bricks extends ImageView {
+    private Boolean damaged = false;
     public Bricks(Image brickpic,int x, int y){
         this.setImage(brickpic);
         this.setX(x);
         this.setY(y);
     }
+    public void updateDamage(){
+        damaged = true;
+    }
+    public boolean getDamge(){
+        return damaged;
+    }
+
 }
