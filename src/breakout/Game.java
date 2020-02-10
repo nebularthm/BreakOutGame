@@ -299,6 +299,13 @@ import java.util.Scanner;
             else if (code == KeyCode.LEFT) {
                 moverShape.setX(moverShape.getX() - PADDLE_SPEED);
             }
+            else if (code == KeyCode.UP) {
+                moverShape.setY(moverShape.getY() - PADDLE_SPEED);
+            }
+            else if (code == KeyCode.DOWN) {
+                moverShape.setX(moverShape.getY() - PADDLE_SPEED);
+            }
+
 
             // pause/restart animation
             if (code == KeyCode.SPACE) {
