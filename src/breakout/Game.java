@@ -22,6 +22,8 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Scanner;
 
 
@@ -62,7 +64,25 @@ import java.util.Scanner;
         private Label scoreTrack;
         private int myScore;
         private Text scoreText;
+        private ArrayList<ArrayList<Bricks>> levelAsList;
+        private boolean winCon = false;
 
+    /**
+     * this code is from stack, essentially converts
+     * @param twoDArray 2d array of bricks
+     * @return
+     */
+    public  ArrayList<ArrayList<Bricks>> twoDArrayToList(Bricks [][] twoDArray) {
+        ArrayList<ArrayList<Bricks>> list = new ArrayList<>();
+        for (Bricks [] array : twoDArray) {
+            ArrayList<Bricks> tempList = new ArrayList<>();
+            for(Bricks brick: array){
+                tempList.add(brick);
+            }
+            list.add(tempList);
+        }
+        return list;
+    }
     /**
      * this method constructs the grid of bricks by reading the config file for a level
      * @param levelSource string representing filename
@@ -129,7 +149,8 @@ import java.util.Scanner;
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
             level = levelReader("data/tutorial.txt",width,height);
-            for(Bricks [] brickies:level){
+            levelAsList = twoDArrayToList(level);
+            for(ArrayList<Bricks> brickies:levelAsList){
                 for(Bricks brick: brickies){
                     root.getChildren().add(brick);
                 }
@@ -197,7 +218,7 @@ import java.util.Scanner;
                 myBlockSpeedX *= -1;
             }
             //check for case when you hit a brick
-            for(Bricks [] brickies:level){
+            for(ArrayList<Bricks> brickies: levelAsList){
                 for(Bricks brick: brickies){
                     if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                         myBlockSpeedY *= -1;
@@ -209,9 +230,12 @@ import java.util.Scanner;
                     }
                 }
             }
-            for(Bricks [] brickies:level){
-                for(Bricks brick: brickies){
+            for(ArrayList<Bricks> brickies:levelAsList){
+                Iterator<Bricks> itr = brickies.iterator();
+                while(itr.hasNext()){
+                    Bricks brick = itr.next();
                     if(brick.getDamge()){
+                        itr.remove();
                     }
                 }
             }
