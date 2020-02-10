@@ -5,6 +5,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -15,10 +16,14 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Scanner;
+
+
 
 
 /**
@@ -30,20 +35,20 @@ import java.util.Scanner;
 
         public static final String TITLE = "Super Breakout";
         public static final String WINNING_MESSAGE = "WINNER!";
-        public static final int SIZE = 400;
+        public static final int SIZE = 800;
         public static final int FRAMES_PER_SECOND = 60;
         public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
         public static final Paint BACKGROUND = Color.AZURE;
-        public static final int PADDLE_SPEED = 10;
-        public static final int BLOCK_SIZE = 100;
+        public static final int PADDLE_SPEED = 1;
+        public static final int BLOCK_SIZE = 300;
         public static final int BLOCK_MIN_SPEED = 10;
         public static final int BLOCK_MAX_SPEED = 100;
         public static final int BLOCK_SPEEDUP_FACTOR = 2;
         public static final int BRICK_AMOUNT = 5;
-        public static final int BALL_SPEED = 50;
+        public static final int BALL_SPEED = 200;
         public static final String BALL_PICTURE = "https://vignette.wikia.nocookie.net/idle-breakout/images/4/4b/Screen_Shot_2019-04-06_at_4.04.05_PM.png/revision/latest/top-crop/width/360/height/450?cb=20190406210459";
         //TODO: Insert the initial image of the ball here, for now I am using the link provided just for testing purposes
-        public static final String PADDLE_PICTURE = "https://www.paddleballgalaxy.com/mm5/graphics/00000001/z5yellowcomp.jpg";
+        public static final String PADDLE_PICTURE = "https://docs.microsoft.com/en-us/windows/uwp/get-started/images/monogame-tutorial-1.png";
         // some things we need to remember during our game
         private Scene myScene;
         private Timeline myAnimation;
@@ -53,6 +58,7 @@ import java.util.Scanner;
         private ImageView boundary;
         private int myBlockSpeedX, myBlockSpeedY;
         private Bricks [][] level;//this is a 2D array of our bricks
+        private Menu myMenu;
 
     /**
      * this method constructs the grid of bricks by reading the config file for a level
@@ -112,7 +118,7 @@ import java.util.Scanner;
 
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
-            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE,BLOCK_SIZE-60,false,false),width/2 - BLOCK_SIZE/2,4 * height/5,BLOCK_SIZE,BLOCK_SIZE-60);
+            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE,BLOCK_SIZE-250,false,false),width/2 - BLOCK_SIZE/2,4 * height/5,BLOCK_SIZE,BLOCK_SIZE-60);
             myBlockSpeedX = BALL_SPEED;
             myBlockSpeedY = BALL_SPEED;
             root.getChildren().add(myPaddle);
@@ -130,6 +136,14 @@ import java.util.Scanner;
             boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),10,false,false));
             boundary.setY(9 * height/10);
             root.getChildren().add(boundary);
+            BufferedImage img = null;
+            try {
+                img = ImageIO.read(new File(Main.class.getClassLoader().getResource("Images/gameover.png").getFile()));
+            } catch (IOException e) {
+            }
+            ;
+            myMenu = new Menu(SwingFXUtils.toFXImage(img, null ),SIZE/2,SIZE/2);
+
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -153,27 +167,29 @@ import java.util.Scanner;
             }
 
             // check for collisions TODO: Make  a physics class that handles this, for now I will figure out how to do this later
-//            if (Shape.intersect(myPaddle, myBall).getBoundsInLocal().getWidth() != -1) {
-//                // reset player's position to the start
-//                myPaddle.setX(myScene.getWidth() / 2 - myPaddle.getWidth() / 2);
-//                myPaddle.setY(myScene.getHeight() - myPaddle.getHeight());
-//            }
+             //            if (Shape.intersect(myPaddle, myBall).getBoundsInLocal().getWidth() != -1) {
+            //                // reset player's position to the start
+            //                myPaddle.setX(myScene.getWidth() / 2 - myPaddle.getWidth() / 2);
+            //                myPaddle.setY(myScene.getHeight() - myPaddle.getHeight());
+            //            }
             //this is for when the ball hits the boundary
             if(myBall.getBoundsInParent().intersects(boundary.getBoundsInParent())){
-                myBall.setX(0);
+                myBall.setX(SIZE/2);
                 myBall.setY(myScene.getHeight()/2);
+                myBlockSpeedX = 0;
+                myBlockSpeedY = 0;
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
                 myBlockSpeedY *= -1;
-                myBlockSpeedX *= -1;
+                myBlockSpeedX *= 1;
             }
             //check for case when you hit a brick
             for(Bricks [] brickies:level){
                 for(Bricks brick: brickies){
                     if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                         myBlockSpeedY *= -1;
-                        myBlockSpeedX *= -1;
+                        myBlockSpeedX *= 1;
                     }
                 }
             }
@@ -185,17 +201,25 @@ import java.util.Scanner;
             // move player
             ImageView moverShape = myPaddle;
             if (code == KeyCode.RIGHT) {
-                moverShape.setX(moverShape.getX() + PADDLE_SPEED);
+                for (int i = 0; i<10;i++){
+
+                    moverShape.setX(moverShape.getX() + PADDLE_SPEED);
+
+                }
             }
             else if (code == KeyCode.LEFT) {
-                moverShape.setX(moverShape.getX() - PADDLE_SPEED);
+                for (int i = 0; i<10;i++){
+
+                    moverShape.setX(moverShape.getX() - PADDLE_SPEED);
+
+                }
             }
-            else if (code == KeyCode.UP) {
+           /* else if (code == KeyCode.UP) {
                 moverShape.setY(moverShape.getY() - PADDLE_SPEED);
             }
             else if (code == KeyCode.DOWN) {
                 moverShape.setY(moverShape.getY() + PADDLE_SPEED);
-            }
+            } */
             // pause/restart animation
             if (code == KeyCode.SPACE) {
                 if (myAnimation.getStatus() == Animation.Status.RUNNING) {
@@ -206,12 +230,13 @@ import java.util.Scanner;
                 }
             }
             //when you press r this completely resets ball and paddle
-            if(code == KeyCode.R){
+            else if(code == KeyCode.R){
                 myBall.setX(0);
                 myBall.setY(myScene.getHeight()/2);
                 myPaddle.setX(myScene.getWidth()/2);
                 myPaddle.setY(myScene.getHeight()/2);
             }
+
         }
         public static void main (String[] args) {
             launch(args);
