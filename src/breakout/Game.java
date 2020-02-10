@@ -15,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -60,6 +61,7 @@ import java.util.Scanner;
         private Label hLabel;
         private Label scoreTrack;
         private int myScore;
+        private Text scoreText;
 
     /**
      * this method constructs the grid of bricks by reading the config file for a level
@@ -144,7 +146,8 @@ import java.util.Scanner;
             hLabel.setLayoutY(7 * height/8);
             root.getChildren().add(hLabel);
             myScore = 0;
-            scoreTrack = new Label("Score: " + myScore + "0");
+            scoreText = new Text(myScore + "0");
+            scoreTrack = new Label("Score: ", scoreText);
             scoreTrack.setLayoutY(7*height/8);
             scoreTrack.setLayoutX(width * 4/5);
             root.getChildren().add(scoreTrack);
@@ -184,7 +187,7 @@ import java.util.Scanner;
                 healthBar.setProgress(healthBar.getProgress() - BALL_PENALTY);
                 hLabel = new Label("Health", healthBar);
             }
-            if(healthBar.getProgress() == 0){
+            if(healthBar.getProgress() == 0){//this is if you run out of health
                 System.out.println("You lost the game and you suck");
                 myAnimation.stop();
             }
@@ -200,13 +203,15 @@ import java.util.Scanner;
                         myBlockSpeedY *= -1;
                         myBlockSpeedX *= -1;
                         brick.updateDamage();
+                        myScore += 10;
+                        scoreText.setText(myScore + "0");
+                        scoreTrack = new Label("Score: ",scoreText);
                     }
                 }
             }
             for(Bricks [] brickies:level){
                 for(Bricks brick: brickies){
-                    if(brick.getDamge() == true){
-                       brick = null;
+                    if(brick.getDamge()){
                     }
                 }
             }
