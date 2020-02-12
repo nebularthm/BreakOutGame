@@ -248,8 +248,9 @@ import java.util.Scanner;
             }
             if(healthBar.getProgress() == 0){//this is if you run out of health
                 System.out.println("You lost the game and you suck");
-
-                myAnimation.stop();
+                root.getChildren().clear();
+                root.getChildren().add(myMenu);
+                //myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
