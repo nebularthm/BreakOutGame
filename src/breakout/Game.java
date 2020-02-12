@@ -354,6 +354,26 @@ import java.util.Scanner;
             if(code == KeyCode.B){
                 myBall.setFitWidth(myBall.getWidth() * 2);
             }
+            if(code == KeyCode.D){// we are going to break the first undamaged brick
+                for(ArrayList<Bricks> brickies:levelAsList){
+                    Iterator<Bricks> itr = brickies.iterator();
+                    while(itr.hasNext()){
+                        Bricks brick = itr.next();
+                        if(!brick.getDamge()){
+                            brick.setImage(null);
+                            itr.remove();
+                            root.getChildren().remove(brick);
+                            if(isPowerUP == false) {
+                                isPowerUP = true;
+
+                                bigpaddie = new PowerUp(new Image(BIGGERPADDLE,30,30,false,false), brick.getX(), brick.getY());
+                                root.getChildren().add(bigpaddie);
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
         }
         public static void main (String[] args) {
             launch(args);
