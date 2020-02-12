@@ -422,9 +422,10 @@ import java.util.Scanner;
             }
             //setRate - increases the rate
             if(code == KeyCode.F){//this engages fast mode
-//                myBlockSpeedY *= 2;
-//                myBlockSpeedX *= 2;
                 myAnimation.setRate(5);
+            }
+            if(code == KeyCode.S){//this engages fast mode
+                myAnimation.setRate(.1);
             }
         }
         public static void main (String[] args) {
