@@ -308,6 +308,21 @@ import java.util.Scanner;
             // TODO: check for win and, if true, pause the animation
         }
 
+    /**
+     * counts the bricks remaining in the grid
+     * @return the int with bricks
+     */
+    private int brickCount(){
+        int brickAmount = 0;
+        for(ArrayList<Bricks> brickies:levelAsList){
+            Iterator<Bricks> itr = brickies.iterator();
+            while(itr.hasNext()){
+                brickAmount++;
+            }
+        }
+        return brickAmount;
+        }
+
         // What to do each time a key is pressed
         private void handleKeyInput (KeyCode code) {
             // move player
