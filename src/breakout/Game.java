@@ -227,23 +227,9 @@ import java.util.Scanner;
 //            Rectangle moverShape = myPaddle.getShape();
 
             // update attributes
-            if(isPowerUP) {
-                bigpaddie.setY(bigpaddie.getY() + 50 * elapsedTime);
-                if (bigpaddie.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
-                    myPaddle.setFitWidth(myScene.getWidth()-50);
-                    isPowerUP = false;
-                    root.getChildren().remove(bigpaddie);
-                }
-            }
+            dropPowerUp(elapsedTime);
 
-            myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
-            if (myBall.getX() + myBall.getWidth()>= myScene.getWidth() || myBall.getX() <= 0 ) {
-               myBlockSpeedX *= -1;
-            }
-            myBall.setY(myBall.getY() + myBlockSpeedY * elapsedTime);
-            if (myBall.getY()  >= myScene.getHeight() || myBall.getY() <= 0 ) {
-                myBlockSpeedY *= -1; 
-            }
+            updateBall(elapsedTime);
 
             // check for collisions TODO: Make  a physics class that handles this, for now I will figure out how to do this later
 //            if (Shape.intersect(myPaddle, myBall).getBoundsInLocal().getWidth() != -1) {
@@ -274,39 +260,83 @@ import java.util.Scanner;
 
             }
             //check for case when you hit a brick
-            for(ArrayList<Bricks> brickies: levelAsList){
-                for(Bricks brick: brickies){
-                    if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
-                        myBlockSpeedY *= -1;
-                        myBlockSpeedX *= 1;
-
-                        brick.updateDamage();
-                        myScore += 10;
-                        scoreText.setText(myScore + "0");
-                        scoreTrack = new Label("Score: ",scoreText);
-
-                    }
-                }
-            }
-            for(ArrayList<Bricks> brickies:levelAsList){
-                Iterator<Bricks> itr = brickies.iterator();
-                while(itr.hasNext()){
-                    Bricks brick = itr.next();
-                    if(brick.getDamge()){
-                        brick.setImage(null);
-                        itr.remove();
-                        root.getChildren().remove(brick);
-                        if(isPowerUP == false) {
-                            isPowerUP = true;
-
-                            bigpaddie = new PowerUp(new Image(BIGGERPADDLE,30,30,false,false), brick.getX(), brick.getY());
-                            root.getChildren().add(bigpaddie);
-                        }
-                    }
-                }
-            }
+            updateBricks();
+            destroyBricks();
             // TODO: check for win and, if true, pause the animation
         }
+
+    /**
+     * this method handles updating the health of bricks as they are collided into
+     */
+    private void updateBricks() {
+        for(ArrayList<Bricks> brickies: levelAsList){
+            for(Bricks brick: brickies){
+                if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
+                    myBlockSpeedY *= -1;
+                    myBlockSpeedX *= 1;
+                    brick.updateDamage();
+                    myScore += 10;
+                    scoreText.setText(myScore + "0");
+                    scoreTrack = new Label("Score: ",scoreText);
+
+                }
+            }
+        }
+    }
+
+    /**
+     * This method handles the destruction of bricks
+     */
+    private void destroyBricks() {
+        for(ArrayList<Bricks> brickies:levelAsList){
+            Iterator<Bricks> itr = brickies.iterator();
+            while(itr.hasNext()){
+                Bricks brick = itr.next();
+                if(brick.getDamge()){
+                    brick.setImage(null);
+                    itr.remove();
+                    root.getChildren().remove(brick);
+                    if(isPowerUP == false) {
+                        isPowerUP = true;
+
+                        bigpaddie = new PowerUp(new Image(BIGGERPADDLE,30,30,false,false), brick.getX(), brick.getY());
+                        root.getChildren().add(bigpaddie);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * This method updates the positioning of the ball
+     * @param elapsedTime
+     */
+    private void updateBall(double elapsedTime) {
+        myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
+        if (myBall.getX() + myBall.getWidth()>= myScene.getWidth() || myBall.getX() <= 0 ) {
+           myBlockSpeedX *= -1;
+        }
+        myBall.setY(myBall.getY() + myBlockSpeedY * elapsedTime);
+        if (myBall.getY()  >= myScene.getHeight() || myBall.getY() <= 0 ) {
+            myBlockSpeedY *= -1;
+        }
+    }
+
+    /**
+     * This method drops a powerup from a brick that was destroyed on the PREVIOUS frame
+     * @param elapsedTime how much time has elapsed
+     */
+    private void dropPowerUp(double elapsedTime) {
+        if(isPowerUP) {
+            bigpaddie.setY(bigpaddie.getY() + 50 * elapsedTime);
+            if (bigpaddie.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
+                myPaddle.setFitWidth(myScene.getWidth()-50);
+                isPowerUP = false;
+                root.getChildren().remove(bigpaddie);
+            }
+        }
+    }
+
 
     /**
      * counts the bricks remaining in the grid
@@ -324,6 +354,7 @@ import java.util.Scanner;
         }
 
         // What to do each time a key is pressed
+
         private void handleKeyInput (KeyCode code) {
             // move player
             ImageView moverShape = myPaddle;
