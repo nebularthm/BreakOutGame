@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -23,6 +24,7 @@ import javafx.util.Duration;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -190,14 +192,24 @@ import java.util.Scanner;
             scoreTrack.setLayoutX(width * 4/5);
             scoreTrack.setId("scoreTrack");
             root.getChildren().add(scoreTrack);
-            BufferedImage img = null;
+//            BufferedImage img = null;
+//            try {
+//                img = ImageIO.read(new File(Main.class.getClassLoader().getResource("Images/gameover.png").getFile()));
+//            } catch (IOException e) {
+//                System.out.print(e);
+//            }
+            FileInputStream imgFile = null;
             try {
-                img = ImageIO.read(new File(Main.class.getClassLoader().getResource("Images/gameover.png").getFile()));
-            } catch (IOException e) {
-                System.out.print(e);
+                imgFile = new FileInputStream("data/Images/gameover.png");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
+            Image img = new Image(imgFile);
 
-            myMenu = new Menu(SwingFXUtils.toFXImage(img, null ),SIZE/2,SIZE/2);
+            myMenu = new Menu(img,SIZE/2,SIZE/2);
+            myMenu.setFitWidth(100);
+            myMenu.setFitHeight(100);
+
 
 
 
@@ -250,6 +262,9 @@ import java.util.Scanner;
                 System.out.println("You lost the game and you suck");
                 root.getChildren().clear();
                 root.getChildren().add(myMenu);
+                // TODO: Figure out how to get the button on the menu
+//                Button ret = myMenu.getReset();
+//                root.getChildren().add(ret);
                 //myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall

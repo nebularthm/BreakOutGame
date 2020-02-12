@@ -15,7 +15,10 @@ public class Menu extends ImageView {
         this.setImage(img);
         this.setX(x);
         this.setY(y);
-        reset = new Button("Reset");
+        reset = new Button("Reset",this);
 
+    }
+    public Button getReset(){
+        return reset;
     }
 }
