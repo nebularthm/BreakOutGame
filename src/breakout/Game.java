@@ -79,6 +79,7 @@ import java.util.Scanner;
         private boolean isPowerUP = false;
         private Menu myMenu;
 
+        //StackPane menu
     /**
      * this code is from stack, essentially converts
      * @param twoDArray 2d array of bricks
@@ -224,12 +225,12 @@ import java.util.Scanner;
             }
 
             myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
-            if (myBall.getX() >= myScene.getWidth() || myBall.getX() <= 0 ) {
+            if (myBall.getX() + myBall.getWidth()>= myScene.getWidth() || myBall.getX() <= 0 ) {
                myBlockSpeedX *= -1;
             }
             myBall.setY(myBall.getY() + myBlockSpeedY * elapsedTime);
-            if (myBall.getY() >= myScene.getHeight() || myBall.getY() <= 0 ) {
-                myBlockSpeedY *= -1;
+            if (myBall.getY()  >= myScene.getHeight() || myBall.getY() <= 0 ) {
+                myBlockSpeedY *= -1; 
             }
 
             // check for collisions TODO: Make  a physics class that handles this, for now I will figure out how to do this later
@@ -247,7 +248,7 @@ import java.util.Scanner;
             }
             if(healthBar.getProgress() == 0){//this is if you run out of health
                 System.out.println("You lost the game and you suck");
-                
+
                 myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall
