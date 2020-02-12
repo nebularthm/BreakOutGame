@@ -265,6 +265,9 @@ import java.util.Scanner;
             // TODO: check for win and, if true, pause the animation
         }
 
+    /**
+     * this method handles updating the health of bricks as they are collided into
+     */
     private void updateBricks() {
         for(ArrayList<Bricks> brickies: levelAsList){
             for(Bricks brick: brickies){
@@ -281,6 +284,9 @@ import java.util.Scanner;
         }
     }
 
+    /**
+     * This method handles the destruction of bricks
+     */
     private void destroyBricks() {
         for(ArrayList<Bricks> brickies:levelAsList){
             Iterator<Bricks> itr = brickies.iterator();
@@ -301,6 +307,10 @@ import java.util.Scanner;
         }
     }
 
+    /**
+     * This method updates the positioning of the ball
+     * @param elapsedTime
+     */
     private void updateBall(double elapsedTime) {
         myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
         if (myBall.getX() + myBall.getWidth()>= myScene.getWidth() || myBall.getX() <= 0 ) {
