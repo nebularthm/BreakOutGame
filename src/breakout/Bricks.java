@@ -11,10 +11,11 @@ import javafx.scene.image.ImageView;
 public class Bricks extends ImageView {
     private int health;
     private Boolean destroyed = false;
-    public Bricks(Image brickpic,int x, int y){
+    public Bricks(Image brickpic,int x, int y, int hp){
         this.setImage(brickpic);
         this.setX(x);
         this.setY(y);
+        health = hp;
     }
     public void updateDestroyed(){
         if(health <= 0)
