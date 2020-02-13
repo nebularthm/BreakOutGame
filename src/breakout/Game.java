@@ -273,7 +273,7 @@ import java.util.Scanner;
             for(Bricks brick: brickies){
                 if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                     myBlockSpeedY *= -1;
-                    myBlockSpeedX *= 1;
+                    myBlockSpeedX *= -1;
                     brick.updateDamage();
                     myScore += 10;
                     scoreText.setText(myScore + "0");
@@ -426,6 +426,9 @@ import java.util.Scanner;
             }
             if(code == KeyCode.S){//this engages fast mode
                 myAnimation.setRate(.1);
+            }
+            if(code == KeyCode.N){//makes stuff normal
+                myAnimation.setRate(1);
             }
         }
         public static void main (String[] args) {
