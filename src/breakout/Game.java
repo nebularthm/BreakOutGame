@@ -93,6 +93,7 @@ import java.util.Scanner;
         private Group root;
         private boolean isPowerUP = false;
         private Menu myMenu;
+        private int dmgPenalty;
 
         //StackPane menu
     /**
@@ -150,30 +151,30 @@ import java.util.Scanner;
     private Bricks makeBrick(String brickType,int i,int j,int width,int height) {
         if (brickType.toLowerCase().contains(GREEN)) {
             Image defaultBrick = new Image(GREEN_BRICK, 30, 30, false, false);
-            return new Bricks(defaultBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT),1);
+            return new Bricks(defaultBrick, (.5 *i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),1);
         }
         if(brickType.toLowerCase().contains(BLUE)){
             Image blueBrick = new Image(BLUE_BRICK, 30, 30, false, false);
-            return new Bricks(blueBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT),2);
+            return new Bricks(blueBrick, (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),2);
         }
         if(brickType.toLowerCase().contains(ORANGE)){
             Image oranBrick = new Image(Orange_BRICK, 30, 30, false, false);
-            return new Bricks(oranBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT),3);
+            return new Bricks(oranBrick, (.5 * i * width / BRICK_AMOUNT), ( .5 * j * height / BRICK_AMOUNT),3);
         }
         if(brickType.toLowerCase().contains(RED)){
             Image redBrick = new Image(RED_BRICK, 30, 30, false, false);
-            return new Bricks(redBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT),4);
+            return new Bricks(redBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),4);
         }
         if(brickType.toLowerCase().contains(WHITE)){
             Image whiteBrick = new Image(White_BRICK, 30, 30, false, false);
-            return new Bricks(whiteBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT),5);
+            return new Bricks(whiteBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),5);
         }
         if(brickType.toLowerCase().contains(PURP)){
             Image purpBrick = new Image(PURPBRICK, 30, 30, false, false);
-            return new Bricks(purpBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT),6);
+            return new Bricks(purpBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),6);
         }
         Image blackBrick = new Image(BLACK_BRICK, 30, 30, false, false);
-        return new Bricks(blackBrick, (int) (i * width / BRICK_AMOUNT), (int) ( .5 * j * height / BRICK_AMOUNT),6);
+        return new Bricks(blackBrick,  (.5 * i * width / BRICK_AMOUNT), ( .5 * j * height / BRICK_AMOUNT),6);
 
     }
         /**
@@ -202,7 +203,7 @@ import java.util.Scanner;
             // make some shapes, set their properties, and add them to the scene
             Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
             myBall = new Ball(ballImage,width/2 - 15,height/2 +60);
-
+            dmgPenalty = 1;
             myBall.setSpeed(BALL_SPEED);
             root.getChildren().add(myBall);
             myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
@@ -267,7 +268,12 @@ import java.util.Scanner;
         }
 
         // Change properties of shapes to animate them
-        void step (double elapsedTime) {
+
+    /**
+     * this method handles the animation of the program
+     * @param elapsedTime
+     */
+    void step (double elapsedTime) {
 
 
             // get internal values of other classes
@@ -322,7 +328,7 @@ import java.util.Scanner;
                 if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                     myBlockSpeedY *= -1;
                     myBlockSpeedX *= -1;
-                    brick.updateHealth();
+                    brick.updateHealth(dmgPenalty);
                     brick.updateDestroyed();
                     myScore += 10;
                     scoreText.setText(myScore + "0");
