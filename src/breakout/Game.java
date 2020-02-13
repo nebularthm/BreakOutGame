@@ -5,10 +5,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -21,14 +19,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -59,6 +53,13 @@ import java.util.Scanner;
     // some things we need to remember during our game
     public static final String BIGGERPADDLE = "https://i.pinimg.com/originals/b4/92/d5/b492d594465b29bcbe7ff840fa18c896.png";
         private static final double BALL_PENALTY = 0.25 ;
+    private static final String GREEN = "green";
+    private static final String BLUE = "blue";
+    private static final String ORANGE = "orange";
+    private static final String RED = "red";
+    private static final String WHITE = "white";
+    private static final String PURP = "purple";
+    private static final String BLACK = "black";
     // some things we need to remember during our game
         private Scene myScene;
         private Timeline myAnimation;
@@ -104,7 +105,7 @@ import java.util.Scanner;
      * @return
      */
     private Bricks [][]  levelReader(String levelSource, int width, int height){
-            Bricks [][] brickconfig = new Bricks[BRICK_AMOUNT-1][BRICK_AMOUNT];
+            Bricks [][] brickconfig = new Bricks[BRICK_AMOUNT][BRICK_AMOUNT];
             File lev  = new File(levelSource);
             Scanner levelScanner;
             try{
@@ -128,6 +129,34 @@ import java.util.Scanner;
             }
             return brickconfig;
         }
+
+    /**
+     * based on the type of brick, we set the HP of this brick
+     * @param brickType type of brick in the file
+     * @return
+     */
+    private int setBrickHP(String brickType) {
+        if (brickType.toLowerCase().contains(GREEN)) {
+            return 1;
+        }
+        if(brickType.toLowerCase().contains(BLUE)){
+            return 2;
+        }
+        if(brickType.toLowerCase().contains(ORANGE)){
+            return 3;
+        }
+        if(brickType.toLowerCase().contains(RED)){
+            return 4;
+        }
+        if(brickType.toLowerCase().contains(WHITE)){
+            return 5;
+        }
+        if(brickType.toLowerCase().contains(PURP)){
+            return 6;
+        }
+            return 6;
+
+    }
         /**
          * Initialize what will be displayed and how it will be updated.
          */
@@ -274,7 +303,7 @@ import java.util.Scanner;
                 if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
                     myBlockSpeedY *= -1;
                     myBlockSpeedX *= -1;
-                    brick.updateDamage();
+                    brick.updateDestroyed();
                     myScore += 10;
                     scoreText.setText(myScore + "0");
                     scoreTrack = new Label("Score: ",scoreText);
@@ -292,7 +321,7 @@ import java.util.Scanner;
             Iterator<Bricks> itr = brickies.iterator();
             while(itr.hasNext()){
                 Bricks brick = itr.next();
-                if(brick.getDamge()){
+                if(brick.isDestroyed()){
                     brick.setImage(null);
                     itr.remove();
                     root.getChildren().remove(brick);
@@ -405,7 +434,7 @@ import java.util.Scanner;
                     Iterator<Bricks> itr = brickies.iterator();
                     while(itr.hasNext()){
                         Bricks brick = itr.next();
-                        if(!brick.getDamge()){
+                        if(!brick.isDestroyed()){
                             brick.setImage(null);
                             itr.remove();
                             root.getChildren().remove(brick);
