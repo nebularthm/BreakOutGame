@@ -6,11 +6,8 @@ package breakout;
 import javafx.scene.image.*;
 
 public class Ball extends ImageView {
-    private double height;
-    private double width;
 private double ballSpeedX;
 private double ballSpeedY;
-
 /**
      * This is the basic constructor for ball objects
      * @param picture picture of this ball
@@ -34,12 +31,7 @@ public void setSpeedY(double speed){ballSpeedY = speed;}
     public double getBallSpeedY(){ return ballSpeedY;}
 
 
-    public double getWidth() {
-        return this.width;
-    }
-    public double getHeight() {
-        return this.height;
-    }
+
 
 
 }
