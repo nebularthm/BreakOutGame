@@ -11,10 +11,9 @@ public class PowerUp extends ImageView {
      * @param x
      * @param y
      */
-    public PowerUp(Image powerImage, double x, double y){
+    public PowerUp(Image powerImage){
         this.setImage(powerImage);
-        this.setX(x);
-        this.setY(y);
+
     }
 
     /**
