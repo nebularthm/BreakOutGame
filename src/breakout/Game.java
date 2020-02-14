@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Random;
 
 
 /**
@@ -120,8 +121,30 @@ import java.util.Scanner;
      */
     private ArrayList<PowerUp> allPowerUps(){
             ArrayList<PowerUp> retList = new ArrayList<>();
+            PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+            bigpad.setType(BIG_PADDLE);
+            retList.add(bigpad);
+//        PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+//        retList.add(bigpad);
+//        PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+//        retList.add(bigpad);
+//        PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+//        retList.add(bigpad);
+//        PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+        //retList.add(bigpad);
             return retList;
         }
+
+
+        private void powerUPEffect(String type){
+            if(type.equals(BIG_PADDLE)){
+                bigify();
+            }
+        }
+
+    private void bigify() {
+        myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
+    }
 
     /**
      * this code is from stack, essentially converts
@@ -281,7 +304,7 @@ import java.util.Scanner;
             myMenu.setFitHeight(100);
 
 
-
+            possiblePowerUps = allPowerUps();
 
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
@@ -375,7 +398,10 @@ import java.util.Scanner;
                     if(isPowerUP == false) {
                         isPowerUP = true;
 
-                        powerUp = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+                        Random rand = new Random();
+                        powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
+                        powerUp.setX(brick.getX());
+                        powerUp.setY(brick.getY());
                         root.getChildren().add(powerUp);
                     }
                 }
@@ -406,7 +432,7 @@ import java.util.Scanner;
         if(isPowerUP) {
             powerUp.setY(powerUp.getY() + 50 * elapsedTime);
             if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
-                myPaddle.setFitWidth(myScene.getWidth()-50);
+                powerUPEffect(powerUp.getType());
                 isPowerUP = false;
                 root.getChildren().remove(powerUp);
             }
@@ -478,7 +504,8 @@ import java.util.Scanner;
             }
             if(code == KeyCode.P){
                 isPowerUP = true;
-                powerUp = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+                Random rand = new Random();
+                powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
                 root.getChildren().add(powerUp);
             }
             if(code == KeyCode.B){
@@ -495,8 +522,8 @@ import java.util.Scanner;
                             root.getChildren().remove(brick);
                             if(isPowerUP == false) {
                                 isPowerUP = true;
-
-                                powerUp = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
+                                Random rand = new Random();
+                                powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
                                 root.getChildren().add(powerUp);
                             }
                             return;
