@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -69,7 +70,7 @@ import java.util.Scanner;
     private static final String White_BRICK = "https://brickit.com/images/_site/shapes/shape-image-9.png";
     private static final String PURPBRICK = "https://www.lightstax.eu/wp-content/uploads/2016/10/regular-purple-2x4.png";
     private static final String BLACK_BRICK = "https://img.brickowl.com/files/image_cache/larger/lego-black-brick-2-x-4-3001-2-771344-38.jpg";
-
+    private static final int lvlcounter = 1;
 
 
     // some things we need to remember during our game
@@ -297,9 +298,12 @@ import java.util.Scanner;
                 root.getChildren().clear();
                 root.getChildren().add(myMenu);
                 // TODO: Figure out how to get the button on the menu
-//                Button ret = myMenu.getReset();
-//                root.getChildren().add(ret);
-                //myAnimation.stop();
+               Button ret = new Button("Reset");
+                     //  myMenu.getReset();
+                root.getChildren().add(ret);
+                myAnimation.stop();
+
+                //hbox vbox grid pane
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
