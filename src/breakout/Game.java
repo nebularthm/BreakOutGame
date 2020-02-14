@@ -102,6 +102,7 @@ import java.util.Random;
         private int dmgPenalty;
         private ArrayList<PowerUp> possiblePowerUps;
         private LevelBuilder level;
+        private boolean areManyBalls = false;
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected
@@ -138,8 +139,13 @@ import java.util.Random;
      * this method adds 5 balls to the screen, biracial
      */
     private void multiply() {
-    multiBalls = makeMoreBalls();
+    if(areManyBalls == true){
+        return;
+    }
+        multiBalls = makeMoreBalls();
     for(Ball ball:multiBalls){
+        ball.setSpeedX(myBlockSpeedX);
+        ball.setSpeedY(myBlockSpeedY);
         root.getChildren().add(ball);
     }
     }
@@ -212,12 +218,13 @@ import java.util.Random;
             Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
             myBall = new Ball(ballImage,width/2 - 15,height/2 +60);
             dmgPenalty = 1;
+            myBlockSpeedX = BALL_SPEED;
+            myBlockSpeedY = BALL_SPEED;
             myBall.setSpeedX(myBlockSpeedX);
             myBall.setSpeedY(myBlockSpeedY);
             root.getChildren().add(myBall);
             myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
-            myBlockSpeedX = BALL_SPEED;
-            myBlockSpeedY = BALL_SPEED;
+
             root.getChildren().add(myPaddle);
 
             // create a place to see the shapes
@@ -286,9 +293,13 @@ import java.util.Random;
             dropPowerUp(elapsedTime);
 
             updateBall(elapsedTime);
-            if(multiBalls.size() > 0){
+            if(multiBalls != null){
                 updateManyBalls(elapsedTime);
+                areManyBalls = true;
             }
+            if(multiBalls != null && multiBalls.size() == 0){
+                areManyBalls = false;
+        }
 
             // check for collisions TODO: Make  a physics class that handles this, for now I will figure out how to do this later
              if(myBall.getBoundsInParent().intersects(boundary.getBoundsInParent())){
@@ -313,11 +324,15 @@ import java.util.Random;
 
         }
             //check for case when you hit a brick
-            updateBricks();
+            updateBricks(myBall);
             destroyBricks();
             // TODO: check for win and, if true, pause the animation
         }
 
+    /**
+     * this method is responsible for updating many balls in the case of the multiball powerup
+     * @param elapsedTime
+     */
     private void updateManyBalls(double elapsedTime) {
         Iterator<Ball> itr = multiBalls.iterator();
         while(itr.hasNext()){
@@ -334,23 +349,24 @@ import java.util.Random;
                ball.setImage(null);
                itr.remove();
             }
-            if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
+            if(ball.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
                 ball.setSpeedY(ball.getBallSpeedY() * -1);
                 ball.setSpeedX(ball.getBallSpeedX() * -1);
 
             }
+            updateBricks(ball);
         }
     }
 
     /**
      * this method handles updating the health of bricks as they are collided into
      */
-    private void updateBricks() {
+    private void updateBricks(Ball ball) {
         for(ArrayList<Bricks> brickies: level.getLevelAsList()){
             for(Bricks brick: brickies){
-                if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
-                    myBall.setSpeedY(myBall.getBallSpeedY() * -1);
-                    myBall.setSpeedX(myBall.getBallSpeedX() * -1);
+                if(ball.getBoundsInParent().intersects(brick.getBoundsInParent())){
+                    ball.setSpeedY(ball.getBallSpeedY() * -1);
+                    ball.setSpeedX(ball.getBallSpeedX() * -1);
                     brick.updateHealth(dmgPenalty);
                     brick.updateDestroyed();
                     myScore += 10;
