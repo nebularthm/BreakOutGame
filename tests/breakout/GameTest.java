@@ -4,23 +4,16 @@ package breakout;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
-import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import util.DukeApplicationTest;
-import static org.junit.jupiter.api.Assertions.*;
-
 
 
 class GameTest extends DukeApplicationTest {
@@ -70,7 +63,7 @@ class GameTest extends DukeApplicationTest {
         assertEquals(Game.SIZE/2 - 15, myBall.getX());
         assertEquals(Game.SIZE/2 + 60, myBall.getY());
 
-        assertEquals(50,myBall.getBallSpeed());
+        assertEquals(50,myBall.getBallSpeedX());
     }/*
     @Test
     public void testBallInitialPosition () {

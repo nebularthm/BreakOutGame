@@ -112,8 +112,9 @@ import java.util.Random;
             PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
             bigpad.setType(BIG_PADDLE);
             retList.add(bigpad);
-//        PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
-//        retList.add(bigpad);
+        PowerUp manyball = new PowerUp(new Image(MULTIBALLIMAGE,30,30,false,false));
+        manyball.setType(MULTIBALL);
+        retList.add(manyball);
 //        PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
 //        retList.add(bigpad);
 //        PowerUp bigpad = new PowerUp(new Image(BIGGERPADDLEIMAGE,30,30,false,false));
@@ -128,8 +129,39 @@ import java.util.Random;
             if(type.equals(BIG_PADDLE)){
                 bigify();
             }
+            if(type.equals(MULTIBALL)){
+                multiply();
+            }
         }
 
+    /**
+     * this method adds 5 balls to the screen, biracial
+     */
+    private void multiply() {
+    multiBalls = makeMoreBalls();
+    for(Ball ball:multiBalls){
+        root.getChildren().add(ball);
+    }
+    }
+
+    /**
+     * This method returns a data structure data
+     * @return
+     */
+    private ArrayList<Ball> makeMoreBalls() {
+        ArrayList<Ball> retList = new ArrayList<>();
+        Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
+        retList.add(new Ball(ballImage,0,myScene.getHeight()/2 +60));
+        retList.add(new Ball(ballImage,myScene.getWidth()/4,myScene.getHeight()/2 +60));
+        retList.add(new Ball(ballImage,myScene.getWidth()/2 - 15,myScene.getHeight()/2 +60));
+        retList.add(new Ball(ballImage,3 * myScene.getWidth()/4,myScene.getHeight()/2 +60));
+        retList.add(new Ball(ballImage,7 * myScene.getWidth()/8,myScene.getHeight()/2 +60));
+        return retList;
+    }
+
+    /**
+     * this method doubles the size of the paddle
+     */
     private void bigify() {
         myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
     }
@@ -180,7 +212,8 @@ import java.util.Random;
             Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
             myBall = new Ball(ballImage,width/2 - 15,height/2 +60);
             dmgPenalty = 1;
-            myBall.setSpeed(BALL_SPEED);
+            myBall.setSpeedX(myBlockSpeedX);
+            myBall.setSpeedY(myBlockSpeedY);
             root.getChildren().add(myBall);
             myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
             myBlockSpeedX = BALL_SPEED;
@@ -247,23 +280,18 @@ import java.util.Random;
     void step (double elapsedTime) {
 
 
-            // get internal values of other classes
-//            Rectangle blockShape = myBall.getShape();
-//            Rectangle moverShape = myPaddle.getShape();
+
 
             // update attributes
             dropPowerUp(elapsedTime);
 
             updateBall(elapsedTime);
+            if(multiBalls.size() > 0){
+                updateManyBalls(elapsedTime);
+            }
 
             // check for collisions TODO: Make  a physics class that handles this, for now I will figure out how to do this later
-//            if (Shape.intersect(myPaddle, myBall).getBoundsInLocal().getWidth() != -1) {
-//                // reset player's position to the start
-//                myPaddle.setX(myScene.getWidth() / 2 - myPaddle.getWidth() / 2);
-//                myPaddle.setY(myScene.getHeight() - myPaddle.getHeight());
-//            }
-            //this is for when the ball hits the boundary
-            if(myBall.getBoundsInParent().intersects(boundary.getBoundsInParent())){
+             if(myBall.getBoundsInParent().intersects(boundary.getBoundsInParent())){
                 myBall.setX(0);
                 myBall.setY(myScene.getHeight()/2);
                 healthBar.setProgress(healthBar.getProgress() - BALL_PENALTY);
@@ -280,15 +308,39 @@ import java.util.Random;
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
-                myBlockSpeedY *= -1;
-                myBlockSpeedX *= 1;
+            myBall.setSpeedY(myBall.getBallSpeedY() * -1);
+            myBall.setSpeedX(myBall.getBallSpeedX() * -1);
 
-            }
+        }
             //check for case when you hit a brick
             updateBricks();
             destroyBricks();
             // TODO: check for win and, if true, pause the animation
         }
+
+    private void updateManyBalls(double elapsedTime) {
+        Iterator<Ball> itr = multiBalls.iterator();
+        while(itr.hasNext()){
+            Ball ball = itr.next();
+            ball.setX(ball.getX() + ball.getBallSpeedX() * elapsedTime);
+            if (ball.getX() + ball.getWidth()>= myScene.getWidth() || ball.getX() <= 0 ) {
+                ball.setSpeedX(ball.getBallSpeedX() * -1);
+            }
+            ball.setY(ball.getY() + ball.getBallSpeedY() * elapsedTime);
+            if (ball.getY()  >= myScene.getHeight() || ball.getY() <= 0 ) {
+                ball.setSpeedY(ball.getBallSpeedY() * -1);
+            }
+            if(ball.getBoundsInParent().intersects(boundary.getBoundsInParent())){
+               ball.setImage(null);
+               itr.remove();
+            }
+            if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
+                ball.setSpeedY(ball.getBallSpeedY() * -1);
+                ball.setSpeedX(ball.getBallSpeedX() * -1);
+
+            }
+        }
+    }
 
     /**
      * this method handles updating the health of bricks as they are collided into
@@ -297,8 +349,8 @@ import java.util.Random;
         for(ArrayList<Bricks> brickies: level.getLevelAsList()){
             for(Bricks brick: brickies){
                 if(myBall.getBoundsInParent().intersects(brick.getBoundsInParent())){
-                    myBlockSpeedY *= -1;
-                    myBlockSpeedX *= -1;
+                    myBall.setSpeedY(myBall.getBallSpeedY() * -1);
+                    myBall.setSpeedX(myBall.getBallSpeedX() * -1);
                     brick.updateHealth(dmgPenalty);
                     brick.updateDestroyed();
                     myScore += 10;
@@ -341,13 +393,13 @@ import java.util.Random;
      * @param elapsedTime
      */
     private void updateBall(double elapsedTime) {
-        myBall.setX(myBall.getX() + myBlockSpeedX * elapsedTime);
+        myBall.setX(myBall.getX() + myBall.getBallSpeedX() * elapsedTime);
         if (myBall.getX() + myBall.getWidth()>= myScene.getWidth() || myBall.getX() <= 0 ) {
-           myBlockSpeedX *= -1;
+           myBall.setSpeedX(myBall.getBallSpeedX() * -1);
         }
-        myBall.setY(myBall.getY() + myBlockSpeedY * elapsedTime);
+        myBall.setY(myBall.getY() + myBall.getBallSpeedY() * elapsedTime);
         if (myBall.getY()  >= myScene.getHeight() || myBall.getY() <= 0 ) {
-            myBlockSpeedY *= -1;
+            myBall.setSpeedY(myBall.getBallSpeedY() * -1);
         }
     }
 

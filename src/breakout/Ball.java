@@ -8,7 +8,8 @@ import javafx.scene.image.*;
 public class Ball extends ImageView {
     private double height;
     private double width;
-private double ballSpeed;
+private double ballSpeedX;
+private double ballSpeedY;
 
 /**
      * This is the basic constructor for ball objects
@@ -22,17 +23,17 @@ private double ballSpeed;
     this.setY(y);
     this.setId("ball_is_life");
 }
-public void setSpeed(double speed){
-    ballSpeed = speed;
+public void setSpeedX(double speed){
+    ballSpeedX = speed;
 }
+public void setSpeedY(double speed){ballSpeedY = speed;}
 
-    public double getBallSpeed() {
-        return ballSpeed;
+    public double getBallSpeedX() {
+        return ballSpeedX;
     }
+    public double getBallSpeedY(){ return ballSpeedY;}
 
-    public void onBounce(){
-        ballSpeed *= -1;
-}
+
     public double getWidth() {
         return this.width;
     }
