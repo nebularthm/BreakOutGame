@@ -96,6 +96,7 @@ import java.util.Random;
         private Timeline myAnimation;
         private Paddle myPaddle;
         private Ball myBall;
+        private ArrayList<Ball> multiBalls;
         private ImageView boundary;
         private int myBlockSpeedX, myBlockSpeedY;
         private Bricks [][] level;//this is a 2D array of our bricks
