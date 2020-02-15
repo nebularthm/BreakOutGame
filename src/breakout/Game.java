@@ -42,7 +42,7 @@ import java.util.Random;
         public static final Paint BACKGROUND = Color.AZURE;
         public static final int PADDLE_SPEED = 10;
         public static final int BLOCK_SIZE = 30;
-
+        public static final String LEVEL_SOURCE = "data/levels";
 
         public static final int BALL_SPEED = 50;
 
@@ -104,6 +104,9 @@ import java.util.Random;
         private ArrayList<PowerUp> possiblePowerUps;
         private LevelBuilder level;
         private boolean areManyBalls = false;
+        private ArrayList<String> allLevelPaths;
+        private int maxLevel;
+        private int curLevel;
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
@@ -138,8 +141,12 @@ import java.util.Random;
         return retList;
         }
 
-
-        private void powerUPEffect(String type){
+    /**
+     *
+     *gives a particular powerup, this method provides the effect of that powerup when touched by the paddle
+     * @param type
+     */
+    private void powerUPEffect(String type){
             if(type.equals(BIG_PADDLE)){
                 bigify();
             }
@@ -208,24 +215,6 @@ import java.util.Random;
         myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
     }
 
-    /**
-     * this code is from stack, essentially converts
-     * @param twoDArray 2d array of bricks
-     * @return
-     */
-
-    /**
-     * this method constructs the grid of bricks by reading the config file for a level
-     * @param levelSource string representing filename
-     * @return
-     */
-
-
-    /**
-     * based on the type of brick, we set the HP of this brick
-     * @param brickType type of brick in the file
-     * @return
-     */
 
         /**
          * Initialize what will be displayed and how it will be updated.
@@ -233,7 +222,10 @@ import java.util.Random;
         @Override
         public void start (Stage stage) {
             // attach scene to the stage and display it
-            myScene = setupScene(SIZE, SIZE, BACKGROUND);
+            allLevelPaths = makeLevelPaths();
+            curLevel = 1;
+            maxLevel = allLevelPaths.size();
+            myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(0) );
             stage.setScene(myScene);
             stage.setTitle(TITLE);
             stage.show();
@@ -245,9 +237,19 @@ import java.util.Random;
             myAnimation.play();
         }
 
+    private ArrayList<String> makeLevelPaths() {
+            ArrayList<String> levelsPath = new ArrayList<>();
+            File  levelDir = new File(LEVEL_SOURCE);
+            File [] levelFiles = levelDir.listFiles();
+            for(File file:levelFiles){
+                levelsPath.add(file.getPath());
+            }
+            return levelsPath;
+    }
 
-        // Create the game's "scene": what shapes will be in the game and their starting properties
-        Scene setupScene (int width, int height, Paint background) {
+
+    // Create the game's "scene": what shapes will be in the game and their starting properties
+        Scene setupScene (int width, int height, Paint background, String source) {
             // create one top level collection to organize the things in the scene
             root = new Group();
             // make some shapes, set their properties, and add them to the scene
@@ -267,7 +269,7 @@ import java.util.Random;
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
 
-            level = new LevelBuilder("data/lev1.txt",width,height);
+            level = new LevelBuilder(source,width,height);
             level.setLevelAsList();
 
             for(ArrayList<Bricks> brickies:level.getLevelAsList()){
@@ -325,7 +327,9 @@ import java.util.Random;
 
 
 
-
+            if(brickCount() == 0){
+                loadNextLevel();
+            }
             // update attributes
             dropPowerUp(elapsedTime);
 
@@ -346,7 +350,6 @@ import java.util.Random;
                 hLabel = new Label("Health", healthBar);
             }
             if(healthBar.getProgress() == 0){//this is if you run out of health
-                System.out.println("You lost the game and you suck");
                 root.getChildren().clear();
                 root.getChildren().add(myMenu);
                 // TODO: Figure out how to get the button on the menu
@@ -365,6 +368,15 @@ import java.util.Random;
             destroyBricks();
             // TODO: check for win and, if true, pause the animation
         }
+
+    /**
+     * this method loads the next Level
+     */
+    private void loadNextLevel() {
+        curLevel++;
+        root.getChildren().clear();
+        myScene = setupScene((int)myScene.getWidth(),(int)myScene.getHeight(),Color.AZURE,allLevelPaths.get(curLevel-1));
+    }
 
     /**
      * this method is responsible for updating many balls in the case of the multiball powerup

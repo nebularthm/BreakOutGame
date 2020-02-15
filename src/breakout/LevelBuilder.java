@@ -32,7 +32,11 @@ public class LevelBuilder {
         this.level = levelReader(source, width, height);
 
     }
-
+    /**
+     * this method constructs the grid of bricks by reading the config file for a level
+     * @param levelSource string representing filename
+     * @return
+     */
     public Bricks [][]  levelReader(String levelSource, int width, int height) {
         Bricks [][] brickconfig = new Bricks[BRICK_AMOUNT][BRICK_AMOUNT];
         File lev  = new File(levelSource);
@@ -58,7 +62,11 @@ public class LevelBuilder {
         }
         return brickconfig;
     }
-
+    /**
+     * based on the type of brick, we set the HP of this brick
+     * @param brickType type of brick in the file
+     * @return
+     */
     public Bricks makeBrick(String brickType,int i,int j,int width,int height) {
         if (brickType.toLowerCase().contains(GREEN)) {
             Image defaultBrick = new Image(GREEN_BRICK, 30, 30, false, false);
@@ -99,9 +107,17 @@ public class LevelBuilder {
         }
         return list;
     }
+
+    /**
+     * this code is from stack, essentially converts 2d array into 2d arraylist
+     * @param
+     * @return
+     */
     public void setLevelAsList(){
         this.levelAsList = twoDArrayToList(level);
     }
+
+
     public ArrayList<ArrayList<Bricks>> getLevelAsList() {
        return levelAsList;
     }

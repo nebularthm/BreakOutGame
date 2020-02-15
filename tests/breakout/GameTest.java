@@ -36,10 +36,11 @@ class GameTest extends DukeApplicationTest {
     private ArrayList<ArrayList<Bricks>> levelAsList;
     private boolean winCon = false;
     private PowerUp bigpaddie;
+    private String firstLevl = "data/level1.txt";
 
     @Override
     public void start (Stage stage) {
-        myScene = myGame.setupScene(Game.SIZE, Game.SIZE, Game.BACKGROUND);
+        myScene = myGame.setupScene(Game.SIZE, Game.SIZE, Game.BACKGROUND, firstLevl);
         stage.setScene(myScene);
         stage.show();
         stage.setTitle(myGame.TITLE);
