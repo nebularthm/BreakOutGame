@@ -142,10 +142,53 @@ import java.util.Random;
         }
 
     /**
+     * this method essentially resets the level, tkes on a new root
+     * @param rootie
+     * @param width
+     * @param height
+     * @param source
+     */
+    private void populateRoot(Group rootie,int width,int height, String source){
+        // make some shapes, set their properties, and add them to the scene
+        Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
+        myBall = new Ball(ballImage,width/2 - 15,height/2 +60);
+        dmgPenalty = 1;
+        myBlockSpeedX = BALL_SPEED;
+        myBlockSpeedY = BALL_SPEED;
+        myBall.setSpeedX(myBlockSpeedX);
+        myBall.setSpeedY(myBlockSpeedY);
+        rootie.getChildren().add(myBall);
+        myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
+        myPaddle.setPadSpeedX(PADDLE_SPEED);
+        myPaddle.setPadSpeedY(PADDLE_SPEED);
+        rootie.getChildren().add(myPaddle);
+        level = new LevelBuilder(source,width,height);
+        level.setLevelAsList();
+        for(ArrayList<Bricks> brickies:level.getLevelAsList()){
+            for(Bricks brick: brickies){
+                rootie.getChildren().add(brick);
+            }
+        }
+        //create boundary that ball cannot pass over
+        boundary = new ImageView();
+        boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
+        boundary.setY(4 * height/5);
+        boundary.setId("boundary");
+        root.getChildren().add(boundary);
+        healthBar = new ProgressBar(1);
+        hLabel = new Label("Health",healthBar);
+        hLabel.setLayoutY(7 * height/8);
+        hLabel.setId("hLabel");
+        rootie.getChildren().add(hLabel);
+        rootie.getChildren().add(scoreTrack);
+    }
+
+    /**
      *
      *gives a particular powerup, this method provides the effect of that powerup when touched by the paddle
      * @param type
      */
+
     private void powerUPEffect(String type){
             if(type.equals(BIG_PADDLE)){
                 bigify();
@@ -376,7 +419,7 @@ import java.util.Random;
     private void loadNextLevel() {
         curLevel++;
         root.getChildren().clear();
-        myScene = setupScene((int)myScene.getWidth(),(int)myScene.getHeight(),Color.AZURE,allLevelPaths.get(curLevel-1));
+        populateRoot(root,SIZE,SIZE,allLevelPaths.get(curLevel-1));
     }
 
     /**
@@ -500,7 +543,6 @@ import java.util.Random;
             while(itr.hasNext()){
                 Bricks brick = itr.next();
                 brickAmount++;
-
             }
         }
         return brickAmount;
@@ -586,6 +628,9 @@ import java.util.Random;
             }
             if(code == KeyCode.N){//makes stuff normal
                 myAnimation.setRate(1);
+            }
+            if(code == KeyCode.L){
+                loadNextLevel();
             }
         }
         public static void main (String[] args) {
