@@ -327,9 +327,7 @@ import java.util.Random;
 
 
 
-            if(brickCount() == 0){
-                loadNextLevel();
-            }
+
             // update attributes
             dropPowerUp(elapsedTime);
 
@@ -366,6 +364,9 @@ import java.util.Random;
             //check for case when you hit a brick
             updateBricks(myBall);
             destroyBricks();
+        if(brickCount() == 0){
+            loadNextLevel();
+        }
             // TODO: check for win and, if true, pause the animation
         }
 
@@ -497,7 +498,9 @@ import java.util.Random;
         for(ArrayList<Bricks> brickies:level.getLevelAsList()){
             Iterator<Bricks> itr = brickies.iterator();
             while(itr.hasNext()){
+                Bricks brick = itr.next();
                 brickAmount++;
+
             }
         }
         return brickAmount;
