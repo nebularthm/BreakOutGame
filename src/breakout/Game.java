@@ -5,10 +5,14 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -19,13 +23,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.Random;
+import java.io.*;
+import java.util.*;
 
 
 /**
@@ -107,6 +106,7 @@ import java.util.Random;
         private ArrayList<String> allLevelPaths;
         private int maxLevel;
         private int curLevel;
+        private String playerTag;
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
@@ -180,6 +180,11 @@ import java.util.Random;
         hLabel.setLayoutY(7 * height/8);
         hLabel.setId("hLabel");
         rootie.getChildren().add(hLabel);
+        scoreText = new Text(myScore + "0");
+        scoreTrack = new Label("Score: ", scoreText);
+        scoreTrack.setLayoutY(7*height/8);
+        scoreTrack.setLayoutX(width * 4/5);
+        scoreTrack.setId("scoreTrack");
         rootie.getChildren().add(scoreTrack);
     }
 
@@ -390,7 +395,7 @@ import java.util.Random;
                 healthBar.setProgress(healthBar.getProgress() - BALL_PENALTY);
                 hLabel = new Label("Health", healthBar);
             }
-            if(healthBar.getProgress() == 0){//this is if you run out of health
+            if(healthBar.getProgress() == 0){//this is if you run out of health, ie if you lost
                 root.getChildren().clear();
                 root.getChildren().add(myMenu);
                 // TODO: Figure out how to get the button on the menu
@@ -417,9 +422,87 @@ import java.util.Random;
      * this method loads the next Level
      */
     private void loadNextLevel() {
+        if(curLevel == maxLevel){
+            youWon();
+            return;
+        }
         curLevel++;
         root.getChildren().clear();
         populateRoot(root,SIZE,SIZE,allLevelPaths.get(curLevel-1));
+    }
+
+    /**
+     * this handles the win condition, in terms of returning the screen
+     */
+    private void youWon() {
+        //TODO: AP write/call the WIn Screen method here
+        writeUserScore();
+    }
+
+    /**
+     * This method prompts the user to write their initials/gamerTag to the score.txt file
+     */
+    private void writeUserScore() {
+        root.getChildren().clear();
+        TextField name = new TextField();
+        name.setPromptText("Enter your epic gamer tag");
+        name.setPrefColumnCount(10);
+        name.setLayoutX(SIZE/2);
+        name.setLayoutY(SIZE/2);
+        playerTag = name.getText();
+        root.getChildren().add(name);
+        Button submit = new Button("Submit");
+        root.getChildren().add(submit);
+        submit.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent e) {
+                if (!name.getText().isEmpty()) {
+                    myAnimation.stop();
+                }
+            }
+        });
+
+        updateScoreFile();
+    }
+
+    /**
+     * This method simply writes whatever the highscore + initial combination is to the file, also sorts the score file as more scores are added
+     */
+    private void updateScoreFile() {
+        try {
+            FileWriter myWriter = new FileWriter("data/score.txt", true);
+            myWriter.write(playerTag + " " + scoreText);
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred in writing your score lmfao you are ass");
+            e.printStackTrace();
+        }
+        sortScores();
+    }
+    private void sortScores(){
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("data/score.txt"));
+            ArrayList<String> lines = new ArrayList<String>();
+            String currentLine = br.readLine();
+            while (currentLine != null)
+            {
+                lines.add(currentLine);
+                currentLine = br.readLine();
+            }
+            br.close();
+            Collections.sort(lines);
+            Collections.reverse(lines);
+            FileWriter myWriter = new FileWriter("data/score.txt", false);
+            for(String str:lines){
+                myWriter.write(str);
+                myWriter.write("\n");
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred in writing your score lmfao you are ass");
+            e.printStackTrace();
+        }
     }
 
     /**
