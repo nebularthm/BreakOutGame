@@ -106,9 +106,9 @@ import java.util.*;
         private ArrayList<String> allLevelPaths;
         private int maxLevel;
         private int curLevel;
-        private String playerTag;
         private ImageView myLaser;
         private boolean isLaser = false;
+        private int scoreKeeper;
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
@@ -298,9 +298,9 @@ import java.util.*;
         public void start (Stage stage) {
             // attach scene to the stage and display it
             allLevelPaths = makeLevelPaths();
-            curLevel = 1;
+            curLevel = 5;
             maxLevel = allLevelPaths.size();
-            myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(0) );
+            myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(4) );
             stage.setScene(myScene);
             stage.setTitle(TITLE);
             stage.show();
@@ -309,6 +309,24 @@ import java.util.*;
             myAnimation = new Timeline();
             myAnimation.setCycleCount(Timeline.INDEFINITE);
             myAnimation.getKeyFrames().add(frame);
+          /*  Menu rules = new Menu( new Image("https://lh3.googleusercontent.com/proxy/geW-yEDSed8CTWRWxRZ4z99HNo-a2CehJqTtv8KOL_3sXGMIqA0Dblp-4ymxpAIwPGmSxFDHJmMPSnUIu1pQ"),SIZE/2 - 200,SIZE/2 -200, "Continue")
+            rules.setFitWidth(400);
+            rules.setFitHeight(300);
+            root.getChildren().add(rules);
+            Button starter = rules.getReset();
+            root.getChildren().add(starter);
+            starter.setLayoutX(170);
+            starter.setLayoutY(350);
+            starter.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent e) {
+                    root.getChildren().clear();
+
+                }
+            });
+
+           */
+
             myAnimation.play();
         }
 
@@ -349,7 +367,14 @@ import java.util.*;
                 e.printStackTrace();
             }
             Image img = new Image(imgFile);
-            myMenu = new Menu(img,SIZE/2,SIZE/2);
+
+
+            myMenu = new Menu(img,SIZE/2 - 200,SIZE/2 -200, "Retry");
+            myMenu.setFitWidth(400);
+            myMenu.setFitHeight(300);
+
+
+            possiblePowerUps = allPowerUps();
 
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
@@ -386,14 +411,26 @@ import java.util.*;
 
                 // TODO: Figure out how to get the button on the menu
 
-               root.getChildren().add(myMenu.getReset());
-               root.getChildren().add(myMenu.getBg());
-               myAnimation.stop();
+               Button ret = myMenu.getReset();
+                root.getChildren().add(ret);
+                ret.setLayoutX(170);
+
+                ret.setLayoutY(350);
+                ret.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent e) {
+                        root.getChildren().clear();
+                        populateRoot(root,SIZE,SIZE,allLevelPaths.get(curLevel-1));
+                    }
+                });
+
+                //myAnimation.stop();
+
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
             myBall.setSpeedY(myBall.getBallSpeedY() * -1);
-            myBall.setSpeedX(myBall.getBallSpeedX() * -1);
+            myBall.setSpeedX(myBall.getBallSpeedX() * 1);
 
         }
             //check for case when you hit a brick
@@ -412,7 +449,9 @@ import java.util.*;
      * this method loads the next Level
      */
     private void loadNextLevel() {
+        scoreKeeper += myScore;
         if(curLevel == maxLevel){
+
             youWon();
             return;
         }
@@ -425,8 +464,23 @@ import java.util.*;
      * this handles the win condition, in terms of returning the screen
      */
     private void youWon() {
+        root.getChildren().clear();
+        Menu win = new Menu(new Image("https://8bitscholar.files.wordpress.com/2010/07/a_winner_is_you_1024.jpg"),SIZE/2 - 200,SIZE/2 -200,"Continue");
+        win.setFitWidth(400);
+        win.setFitHeight(300);
+        root.getChildren().add(win);
+        Button ret = win.getReset();
+        root.getChildren().add(ret);
+        ret.setLayoutX(170);
+        ret.setLayoutY(350);
+        ret.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                writeUserScore();
+            }
+        });
         //TODO: AP write/call the WIn Screen method here
-        writeUserScore();
+
     }
 
     /**
@@ -437,27 +491,33 @@ import java.util.*;
         TextField name = new TextField();
         name.setPromptText("Enter your epic gamer tag");
         name.setPrefColumnCount(10);
-        name.setLayoutX(SIZE/2);
-        name.setLayoutY(SIZE/2);
-        playerTag = name.getText();
+        name.setLayoutX(100);
+        name.setLayoutY(150);
+        name.setPrefWidth(200);
         root.getChildren().add(name);
         Button submit = new Button("Submit");
         root.getChildren().add(submit);
-        submit.setOnAction(e -> {
-            if (!name.getText().isEmpty()) {
-                myAnimation.stop();
+        submit.setLayoutX(170);
+        submit.setLayoutY(350);
+        myAnimation.stop();
+        submit.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent e) {
+                if (!name.getText().isEmpty()) {
+                    updateScoreFile(name.getText(),scoreKeeper);
+                }
             }
         });
 
-        updateScoreFile();
     }
     /**
      * This method simply writes whatever the highscore + initial combination is to the file, also sorts the score file as more scores are added
      */
-    private void updateScoreFile() {
+    private void updateScoreFile(String name, int score) {
         try {
             FileWriter myWriter = new FileWriter("data/score.txt", true);
-            myWriter.write(playerTag + " " + scoreText.getText());
+            myWriter.write(name + " " + score + "\n");
             myWriter.close();
         } catch (IOException e) {
             System.out.println("An error occurred in writing your score lmfao you are ass");
@@ -516,7 +576,8 @@ import java.util.*;
             }
             if(ball.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
                 ball.setSpeedY(ball.getBallSpeedY() * -1);
-                ball.setSpeedX(ball.getBallSpeedX() * -1);
+                ball.setSpeedX(ball.getBallSpeedX() * 1);
+
 
             }
             updateBricks(ball);
@@ -717,7 +778,7 @@ import java.util.*;
             if(code == KeyCode.F){//this engages fast mode
                 myAnimation.setRate(5);
             }
-            if(code == KeyCode.S){//this engages fast mode
+            if(code == KeyCode.S){//this engages slow mode
                 myAnimation.setRate(.1);
             }
             if(code == KeyCode.N){//makes stuff normal
