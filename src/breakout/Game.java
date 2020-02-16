@@ -59,7 +59,7 @@ import java.util.*;
     private static final String  LASERIMAGE = "https://labs.phaser.io/assets/animations/lazer/lazer_01.png";
     private static final String LASERSOURCE = "https://st2.depositphotos.com/5205783/9032/v/950/depositphotos_90328212-stock-illustration-logo-abstract-circle-l-design.jpg";
     private static final String MULTIBALLIMAGE = "https://www.logolynx.com/images/logolynx/c3/c3fc5f02c40e5e729e646a2ca97871ca.jpeg";
-    private static final String LEVELSKIPIMAGE =" https://pbs.twimg.com/profile_images/1002593099829346304/kl4SELak_400x400.jpg";
+    private static final String LEVELSKIPIMAGE ="https://lever-client-logos.s3.amazonaws.com/865db2d7-cddc-4ab2-8f29-e41fe87b74d3-1526542591593.png";
     private static final String FASTBALLIMAGE = "https://i.pinimg.com/originals/a2/f4/14/a2f414b603535c3726a8403de2ed99db.png";
     private static final String FASTPADDLEIMAGE = "https://steamuserimages-a.akamaihd.net/ugc/874122921369426925/E1E9341ECFFFDD61C985EB5B3AE35672F878B523/";
     private static final String TURBOIMAGE = "https://image.shutterstock.com/image-vector/initial-company-circle-t-logo-260nw-752158675.jpg";
@@ -77,7 +77,6 @@ import java.util.*;
     private static final String DOUBLEDMG = "doub";
     private static final String HEAL = "heal";
     private static final String LASER = "laser";
-
 
     // some things we need to remember during our game
         private Scene myScene;
