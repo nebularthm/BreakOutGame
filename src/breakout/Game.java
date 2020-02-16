@@ -690,7 +690,7 @@ import java.util.*;
      * counts the bricks remaining in the grid
      * @return the int with bricks
      */
-    private int brickCount(){
+    public int brickCount(){
         int brickAmount = 0;
         for(ArrayList<Bricks> brickies:level.getLevelAsList()){
             Iterator<Bricks> itr = brickies.iterator();
@@ -760,14 +760,15 @@ import java.util.*;
                         Bricks brick = itr.next();
                         if(!brick.isDestroyed()){
                             brick.setImage(null);
-                            itr.remove();
                             root.getChildren().remove(brick);
+                            itr.remove();
                             if(isPowerUP == false) {
                                 isPowerUP = true;
                                 Random rand = new Random();
                                 powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
                                 root.getChildren().add(powerUp);
                             }
+
                             return;
                         }
                     }
@@ -808,7 +809,28 @@ import java.util.*;
         }
         }
 
+    /**
+     * for testing purposs, gets our level
+     * @return
+     */
+    public LevelBuilder getLevel() {
+        return level;
+    }
 
+    /**
+     * for testing purposes, returns our root
+     * @return
+     */
+    public Group getRoot(){
+        return root;
+    }
+
+    /**
+     * for testing purposes, removes the powerup because when a brick is destroyed with a powerup flag, a powerup is immediatle added to the root
+     */
+    public void removePowerUP(){
+        root.getChildren().remove(powerUp);
+    }
 
     public static void main (String[] args) {
             launch(args);
