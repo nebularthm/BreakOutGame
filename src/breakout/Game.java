@@ -342,6 +342,7 @@ import java.util.*;
             myScene = new Scene(root, width, height, background);
             //create boundary that ball cannot pass over
             populateRoot(root,width,height,source);
+            possiblePowerUps = allPowerUps();
             FileInputStream imgFile = null;
             try {
                 imgFile = new FileInputStream("data/Images/gameover.png");
@@ -350,9 +351,7 @@ import java.util.*;
             }
             Image img = new Image(imgFile);
             myMenu = new Menu(img,SIZE/2,SIZE/2);
-            myMenu.setFitWidth(100);
-            myMenu.setFitHeight(100);
-            possiblePowerUps = allPowerUps();
+
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -385,11 +384,12 @@ import java.util.*;
             }
             if(healthBar.getProgress() == 0){//this is if you run out of health, ie if you lost
                 root.getChildren().clear();
-                root.getChildren().add(myMenu);
+
                 // TODO: Figure out how to get the button on the menu
-//                Button ret = myMenu.getReset();
-//                root.getChildren().add(ret);
-                //myAnimation.stop();
+
+               root.getChildren().add(myMenu.getReset());
+               root.getChildren().add(myMenu.getBg());
+               myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
