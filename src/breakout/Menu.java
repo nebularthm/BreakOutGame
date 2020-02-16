@@ -11,11 +11,13 @@ import javafx.scene.image.ImageView;
  */
 public class Menu extends ImageView {
     Button reset;
-    public Menu(Image img,int x, int y){
+
+    public Menu(Image img,int x, int y, String text){
         this.setImage(img);
         this.setX(x);
         this.setY(y);
-        reset = new Button("Reset",this);
+        reset = new Button(text);
+        this.reset.setMaxSize(100, 200);
 
     }
     public Button getReset(){
