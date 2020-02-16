@@ -103,12 +103,14 @@ import java.util.*;
         private ArrayList<PowerUp> possiblePowerUps;
         private LevelBuilder level;
         private boolean areManyBalls = false;
-        private ArrayList<String> allLevelPaths;
-        private int maxLevel;
+        private ArrayList<String> allLevelPaths = makeLevelPaths();
+
+        private int maxLevel = allLevelPaths.size();
         private int curLevel;
         private ImageView myLaser;
         private boolean isLaser = false;
         private int scoreKeeper;
+
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
@@ -287,7 +289,7 @@ import java.util.*;
      * this method doubles the size of the paddle
      */
     private void bigify() {
-        myPaddle.setFitWidth(myPaddle.getFitWidth() * 2);
+        myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
     }
 
 
@@ -353,9 +355,7 @@ import java.util.*;
             // create one top level collection to organize the things in the scene
             root = new Group();
             curLevel = 1;
-            allLevelPaths = makeLevelPaths();
 
-            maxLevel = allLevelPaths.size();
             // make some shapes, set their properties, and add them to the scene
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
@@ -460,6 +460,7 @@ import java.util.*;
         root.getChildren().clear();
         populateRoot(root,SIZE,SIZE,allLevelPaths.get(curLevel-1));
     }
+
     /**
      * this handles the win condition, in terms of returning the screen
      */
@@ -480,6 +481,7 @@ import java.util.*;
             }
         });
         //TODO: AP write/call the WIn Screen method here
+
     }
 
     /**
@@ -685,6 +687,7 @@ import java.util.*;
         }
     }
 
+
     /**
      * counts the bricks remaining in the grid
      * @return the int with bricks
@@ -700,6 +703,9 @@ import java.util.*;
         }
         return brickAmount;
         }
+
+        // What to do each time a key is pressed
+
     /**
      * handles what ahppens when the player presses a certain key
      * @param code the key the player pressed
@@ -718,6 +724,8 @@ import java.util.*;
             else if (code == KeyCode.DOWN) {
                 myPaddle.setY(myPaddle.getY() + myPaddle.getPadSpeedY());
             }
+
+
             // pause/restart animation
             if (code == KeyCode.SPACE) {
                 if (myAnimation.getStatus() == Animation.Status.RUNNING) {
@@ -734,15 +742,6 @@ import java.util.*;
                 myPaddle.setX(myScene.getWidth()/2);
                 myPaddle.setY(myScene.getHeight()/2);
             }
-            if(code == KeyCode.O){
-                bigify();
-            }
-            if(code == KeyCode.M){
-                myBall.setSpeedX(myBall.getBallSpeedX()*2);
-                myBall.setSpeedY(myBall.getBallSpeedY()*2);
-                myPaddle.setPadSpeedX(myPaddle.getPadSpeedX()*2);
-                myPaddle.setPadSpeedY(myPaddle.getPadSpeedY()*2);
-            }
             if(code == KeyCode.L){//This block of code gives the player full health on the presing of the L key
                 healthBar.setProgress(1);
                 hLabel = new Label("Health", healthBar);
@@ -756,7 +755,17 @@ import java.util.*;
             if(code == KeyCode.B){
                 myBall.setFitWidth(myBall.getFitWidth() * 2);
             }
-            if(code == KeyCode.D){// we are going to break the first undamaged brick
+        if(code == KeyCode.O){
+            bigify();
+        }
+        if(code == KeyCode.M){
+            myBall.setSpeedX(myBall.getBallSpeedX()*2);
+            myBall.setSpeedY(myBall.getBallSpeedY()*2);
+            myPaddle.setPadSpeedX(myPaddle.getPadSpeedX()*2);
+            myPaddle.setPadSpeedY(myPaddle.getPadSpeedY()*2);
+        }
+
+        if(code == KeyCode.D){// we are going to break the first undamaged brick
                 for(ArrayList<Bricks> brickies:level.getLevelAsList()){
                     Iterator<Bricks> itr = brickies.iterator();
                     while(itr.hasNext()){
@@ -771,6 +780,7 @@ import java.util.*;
                                 powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
                                 root.getChildren().add(powerUp);
                             }
+
                             return;
                         }
                     }
@@ -829,7 +839,12 @@ import java.util.*;
 public int getCurLevel(){
         return curLevel;
 }
+
+
     public static void main (String[] args) {
             launch(args);
         }
+
+
+
     }
