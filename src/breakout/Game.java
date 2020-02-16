@@ -57,6 +57,7 @@ import java.util.*;
 
     //These URL's correspond to paddle Images
     private static final String  LASERIMAGE = "https://labs.phaser.io/assets/animations/lazer/lazer_01.png";
+    private static final String LASERSOURCE = "https://st2.depositphotos.com/5205783/9032/v/950/depositphotos_90328212-stock-illustration-logo-abstract-circle-l-design.jpg";
     private static final String MULTIBALLIMAGE = "https://www.logolynx.com/images/logolynx/c3/c3fc5f02c40e5e729e646a2ca97871ca.jpeg";
     private static final String LEVELSKIPIMAGE = "https://lh3.googleusercontent.com/proxy/YHqYDsLvTKimMM9CdmN7NP4foZtIrQDY-S_9aOSM2c4HFkJu4icxQz7XX8AM8r32ExbbkVKLTIGfD40C_vX5DoTpfJaWNXb1Ky5kXfvCcy_1LcsjEgF1";
     private static final String FASTBALLIMAGE = "https://i.pinimg.com/originals/a2/f4/14/a2f414b603535c3726a8403de2ed99db.png";
@@ -75,7 +76,7 @@ import java.util.*;
     private static final String SLOWMO = "slow";
     private static final String DOUBLEDMG = "doub";
     private static final String HEAL = "heal";
-
+    private static final String LASER = "laser";
 
 
     // some things we need to remember during our game
@@ -107,6 +108,8 @@ import java.util.*;
         private int maxLevel;
         private int curLevel;
         private String playerTag;
+        private ImageView myLaser;
+        private boolean isLaser = false;
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
@@ -138,6 +141,12 @@ import java.util.*;
         PowerUp padspeed = new PowerUp(new Image(FASTPADDLEIMAGE,30,30,false,false));
         padspeed.setType(FASTPADDLE);
         retList.add(padspeed);
+        PowerUp lasuh = new PowerUp(new Image(LASERSOURCE,30,30,false,false));
+        lasuh.setType(LASER);
+        retList.add(lasuh);
+        PowerUp skipper = new PowerUp(new Image(LEVELSKIPIMAGE,30,30,false,false));
+        skipper.setType(LEVELSKIP);
+        retList.add(skipper);
         return retList;
         }
 
@@ -186,6 +195,7 @@ import java.util.*;
         scoreTrack.setLayoutX(width * 4/5);
         scoreTrack.setId("scoreTrack");
         rootie.getChildren().add(scoreTrack);
+        isLaser = false;
     }
 
     /**
@@ -194,37 +204,55 @@ import java.util.*;
      * @param type string representing type of powerUp
      */
 
-    private void powerUPEffect(String type){
-            if(type.equals(BIG_PADDLE)){
+    private void powerUPEffect( PowerUp type){
+            if(type.getType().equals(BIG_PADDLE)){
                 bigify();
             }
-            if(type.equals(MULTIBALL)){
+            if(type.getType().equals(MULTIBALL)){
                 multiply();
             }
-            if(type.equals(TURBOMODE)){
+            if(type.getType().equals(TURBOMODE)){
                 myAnimation.setRate(5);
             }
-            if(type.equals(SLOWMO)){
+            if(type.getType().equals(SLOWMO)){
                 myAnimation.setRate(0.1);
             }
-            if(type.equals(DOUBLEDMG)){
+            if(type.getType().equals(DOUBLEDMG)){
                 dmgPenalty *= 2;
             }
-            if(type.equals(HEAL)){
+            if(type.getType().equals(HEAL)){
                 if(healthBar.getProgress() < 1) {
                     healthBar.setProgress(healthBar.getProgress() + dmgPenalty);
                     hLabel = new Label("Health", healthBar);
                 }
             }
-            if(type.equals(FASTER_BALL)){
+            if(type.getType().equals(FASTER_BALL)){
                 myBall.setSpeedX(myBall.getBallSpeedX() * 1.5);
                 myBall.setSpeedY(myBall.getBallSpeedY() * 1.5);
             }
-            if(type.equals(FASTPADDLE)){
+            if(type.getType().equals(FASTPADDLE)){
                myPaddle.setPadSpeedX(myPaddle.getPadSpeedX() * 1.5);
                myPaddle.setPadSpeedY(myPaddle.getPadSpeedY() * 1.5);
             }
+            if(type.getType().equals(LEVELSKIP) && curLevel != maxLevel){
+                loadNextLevel();
+            }
+            if(type.getType().equals(LASER)){
+                loadLaser(powerUp);
+            }
         }
+
+    /**
+     * this method loads a lazer  based  on the x position of a given powerup, this laser will then be preesent for the entire level, and will periodically do damage to all the brickw in front of it,
+     * @param pow powerup object
+     */
+    private void loadLaser(PowerUp pow) {
+        isLaser = true;
+        myLaser = new ImageView((new Image(LASERIMAGE,10, 10 - myScene.getHeight(),false,false)));
+        myLaser.setX(pow.getX());
+        myLaser.setY(boundary.getY()); // we want this powerup to start from the boundary and then shoot upwards into the level
+        root.getChildren().add(myLaser);
+    }
 
     /**
      * this method adds 5 balls to the screen, biracial
@@ -371,6 +399,9 @@ import java.util.*;
         }
             //check for case when you hit a brick
             updateBricks(myBall);
+            if(isLaser){
+                updateBricksImageView(myLaser);
+            }
             destroyBricks();
         if(brickCount() == 0){
             loadNextLevel();
@@ -514,6 +545,24 @@ import java.util.*;
     }
 
     /**
+     * this method is similar to update bricks, except it checks for collision based on a general imageView object, such as lasers or missles. USeful for future feature adding to this game
+     * @param immy Any imageview
+     */
+    private void updateBricksImageView(ImageView immy){
+        for(ArrayList<Bricks> brickies: level.getLevelAsList()){
+            for(Bricks brick: brickies){
+                if(immy.getBoundsInParent().intersects(brick.getBoundsInParent())){
+                    brick.updateHealth(dmgPenalty );
+                    brick.updateDestroyed();
+                    myScore += 10;
+                    scoreText.setText(myScore + "0");
+                    scoreTrack = new Label("Score: ",scoreText);
+                }
+            }
+        }
+    }
+
+    /**
      * This method handles the destruction of bricks
      */
     private void destroyBricks() {
@@ -525,6 +574,9 @@ import java.util.*;
                     brick.setImage(null);
                     itr.remove();
                     root.getChildren().remove(brick);
+                    myScore += 100;
+                    scoreText.setText(myScore + "0");
+                    scoreTrack = new Label("Score: ",scoreText);
                     if(isPowerUP == false) {
                         isPowerUP = true;
 
@@ -562,12 +614,13 @@ import java.util.*;
         if(isPowerUP) {
             powerUp.setY(powerUp.getY() + 50 * elapsedTime);
             if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
-                powerUPEffect(powerUp.getType());
+                powerUPEffect(powerUp);
                 isPowerUP = false;
                 root.getChildren().remove(powerUp);
             }
             if(powerUp.getBoundsInParent().intersects(boundary.getBoundsInParent())){
                 isPowerUP = false;
+                powerUp.setImage(null);
                 root.getChildren().remove(powerUp);
             }
         }
@@ -632,7 +685,7 @@ import java.util.*;
                 healthBar.setProgress(1);
                 hLabel = new Label("Health", healthBar);
             }
-            if(code == KeyCode.P){
+            if(code == KeyCode.P && isPowerUP == false){
                 isPowerUP = true;
                 Random rand = new Random();
                 powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
@@ -674,8 +727,31 @@ import java.util.*;
             if(code == KeyCode.L){
                 loadNextLevel();
             }
+            if(code == KeyCode.DIGIT1){
+                curLevel = 0;
+                loadNextLevel();
         }
-        public static void main (String[] args) {
+        if(code == KeyCode.DIGIT2){
+            curLevel = 1;
+            loadNextLevel();
+        }
+        if(code == KeyCode.DIGIT3){
+            curLevel = 2;
+            loadNextLevel();
+        }
+        if(code == KeyCode.DIGIT4){
+            curLevel = 3;
+            loadNextLevel();
+        }
+        if(code == KeyCode.DIGIT5){
+            curLevel = 4;
+            loadNextLevel();
+        }
+        }
+
+
+
+    public static void main (String[] args) {
             launch(args);
         }
 
