@@ -127,6 +127,14 @@ class GameTest extends DukeApplicationTest {
         assertEquals(startingBricks - 3, remainAftertrip );
 
     }
+    @Test
+    public void testReset(){
+        press(myScene,KeyCode.R);
+        assertEquals(myBall.getX(),0);
+        assertEquals(myBall.getY(),myGame.SIZE/2);
+        assertEquals(myPaddle.getX(),myGame.SIZE/2);
+        assertEquals(myPaddle.getX(),myGame.SIZE/2);
+    }
 
 
 }

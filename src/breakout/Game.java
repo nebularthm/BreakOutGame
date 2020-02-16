@@ -825,12 +825,7 @@ import java.util.*;
         return root;
     }
 
-    /**
-     * for testing purposes, removes the powerup because when a brick is destroyed with a powerup flag, a powerup is immediatle added to the root
-     */
-    public void removePowerUP(){
-        root.getChildren().remove(powerUp);
-    }
+
 
     public static void main (String[] args) {
             launch(args);
