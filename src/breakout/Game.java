@@ -247,9 +247,9 @@ import java.util.*;
      */
     private void loadLaser(PowerUp pow) {
         isLaser = true;
-        myLaser = new ImageView((new Image(LASERIMAGE,20, 10 * myScene.getHeight(),false,false)));
+        myLaser = new ImageView((new Image(LASERIMAGE,20, 2 * myScene.getHeight()- boundary.getY(),false,false)));
         myLaser.setX(pow.getX());
-        myLaser.setY(boundary.getY()); // we want this powerup to start from the boundary and then shoot upwards into the level
+
         root.getChildren().add(myLaser);
     }
 
@@ -298,7 +298,7 @@ import java.util.*;
         public void start (Stage stage) {
             // attach scene to the stage and display it
             allLevelPaths = makeLevelPaths();
-            curLevel = 5;
+            curLevel = 1;
             maxLevel = allLevelPaths.size();
             myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(4) );
             stage.setScene(myScene);
@@ -451,7 +451,6 @@ import java.util.*;
     private void loadNextLevel() {
         scoreKeeper += myScore;
         if(curLevel == maxLevel){
-
             youWon();
             return;
         }
