@@ -297,9 +297,7 @@ import java.util.*;
         @Override
         public void start (Stage stage) {
             // attach scene to the stage and display it
-            allLevelPaths = makeLevelPaths();
-            curLevel = 1;
-            maxLevel = allLevelPaths.size();
+
             myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(4) );
             stage.setScene(myScene);
             stage.setTitle(TITLE);
@@ -354,6 +352,10 @@ import java.util.*;
     Scene setupScene (int width, int height, Paint background, String source) {
             // create one top level collection to organize the things in the scene
             root = new Group();
+            curLevel = 1;
+            allLevelPaths = makeLevelPaths();
+
+            maxLevel = allLevelPaths.size();
             // make some shapes, set their properties, and add them to the scene
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
@@ -824,7 +826,9 @@ import java.util.*;
     public Group getRoot(){
         return root;
     }
-
+public int getCurLevel(){
+        return curLevel;
+}
 
 
     public static void main (String[] args) {

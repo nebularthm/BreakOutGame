@@ -40,6 +40,10 @@ class GameTest extends DukeApplicationTest {
     private String firstLevl = "data/levels/level1.txt";
     private LevelBuilder myLevel;
 
+    /**
+     * for starting the test game
+     * @param stage where the game is played
+     */
     @Override
     public void start (Stage stage) {
         myScene = myGame.setupScene(Game.SIZE, Game.SIZE, Game.BACKGROUND, firstLevl);
@@ -127,6 +131,10 @@ class GameTest extends DukeApplicationTest {
         assertEquals(startingBricks - 3, remainAftertrip );
 
     }
+
+    /**
+     * this test checks that the R key properly resets the posirtion of the ball and the paddle to their origins
+     */
     @Test
     public void testReset(){
         press(myScene,KeyCode.R);
@@ -134,6 +142,19 @@ class GameTest extends DukeApplicationTest {
         assertEquals(myBall.getY(),myGame.SIZE/2);
         assertEquals(myPaddle.getX(),myGame.SIZE/2);
         assertEquals(myPaddle.getX(),myGame.SIZE/2);
+    }
+    @Test
+    public void testLevelSkippers(){
+    press(myScene,KeyCode.DIGIT1);
+        assertEquals(1,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT2);
+        assertEquals(2,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT3);
+        assertEquals(3,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT4);
+        assertEquals(4,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT5);
+        assertEquals(5,myGame.getCurLevel());
     }
 
 
