@@ -110,7 +110,7 @@ import java.util.*;
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
-     * @return
+     * @return an arrayList of all of the powerUIps
      */
     private ArrayList<PowerUp> allPowerUps(){
         ArrayList<PowerUp> retList = new ArrayList<>();
@@ -143,10 +143,10 @@ import java.util.*;
 
     /**
      * this method essentially resets the level, tkes on a new root
-     * @param rootie
-     * @param width
-     * @param height
-     * @param source
+     * @param rootie root to be modified
+     * @param width width of scene
+     * @param height height of scene
+     * @param source source of the level
      */
     private void populateRoot(Group rootie,int width,int height, String source){
         // make some shapes, set their properties, and add them to the scene
@@ -191,7 +191,7 @@ import java.util.*;
     /**
      *
      *gives a particular powerup, this method provides the effect of that powerup when touched by the paddle
-     * @param type
+     * @param type string representing type of powerUp
      */
 
     private void powerUPEffect(String type){
@@ -243,7 +243,7 @@ import java.util.*;
 
     /**
      * This method returns a data structure data
-     * @return
+     * @return an arrayList containing 5 balls
      */
     private ArrayList<Ball> makeMoreBalls() {
         ArrayList<Ball> retList = new ArrayList<>();
@@ -297,54 +297,23 @@ import java.util.*;
 
 
     // Create the game's "scene": what shapes will be in the game and their starting properties
-        Scene setupScene (int width, int height, Paint background, String source) {
+
+    /**
+     * Sets up the scene/initial level
+     * @param width of scene
+     * @param height of scene
+     * @param background of scene
+     * @param source souce for level
+     * @return
+     */
+    Scene setupScene (int width, int height, Paint background, String source) {
             // create one top level collection to organize the things in the scene
             root = new Group();
             // make some shapes, set their properties, and add them to the scene
-            Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
-            myBall = new Ball(ballImage,width/2 - 15,height/2 +60);
-            dmgPenalty = 1;
-            myBlockSpeedX = BALL_SPEED;
-            myBlockSpeedY = BALL_SPEED;
-            myBall.setSpeedX(myBlockSpeedX);
-            myBall.setSpeedY(myBlockSpeedY);
-            root.getChildren().add(myBall);
-            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
-            myPaddle.setPadSpeedX(PADDLE_SPEED);
-            myPaddle.setPadSpeedY(PADDLE_SPEED);
-            root.getChildren().add(myPaddle);
-
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
-
-            level = new LevelBuilder(source,width,height);
-            level.setLevelAsList();
-
-            for(ArrayList<Bricks> brickies:level.getLevelAsList()){
-                for(Bricks brick: brickies){
-                    root.getChildren().add(brick);
-                }
-            }
             //create boundary that ball cannot pass over
-            boundary = new ImageView();
-            boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
-            boundary.setY(4 * height/5);
-            boundary.setId("boundary");
-            root.getChildren().add(boundary);
-            healthBar = new ProgressBar(1);
-            healthBarLabel = new HBox();//https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/progress.htm I am gonna use a ProgressBar to represent the health we have
-
-            hLabel = new Label("Health",healthBar);
-            hLabel.setLayoutY(7 * height/8);
-            hLabel.setId("hLabel");
-            root.getChildren().add(hLabel);
-            myScore = 0;
-            scoreText = new Text(myScore + "0");
-            scoreTrack = new Label("Score: ", scoreText);
-            scoreTrack.setLayoutY(7*height/8);
-            scoreTrack.setLayoutX(width * 4/5);
-            scoreTrack.setId("scoreTrack");
-            root.getChildren().add(scoreTrack);
+            populateRoot(root,width,height,source);
             FileInputStream imgFile = null;
             try {
                 imgFile = new FileInputStream("data/Images/gameover.png");
@@ -352,14 +321,10 @@ import java.util.*;
                 e.printStackTrace();
             }
             Image img = new Image(imgFile);
-
             myMenu = new Menu(img,SIZE/2,SIZE/2);
             myMenu.setFitWidth(100);
             myMenu.setFitHeight(100);
-
-
             possiblePowerUps = allPowerUps();
-
             // respond to
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
@@ -369,16 +334,11 @@ import java.util.*;
 
     /**
      * this method handles the animation of the program
-     * @param elapsedTime
+     * @param elapsedTime time that has passed
      */
     void step (double elapsedTime) {
-
-
-
-
             // update attributes
             dropPowerUp(elapsedTime);
-
             updateBall(elapsedTime);
             if(multiBalls != null){
                 updateManyBalls(elapsedTime);
@@ -453,26 +413,21 @@ import java.util.*;
         root.getChildren().add(name);
         Button submit = new Button("Submit");
         root.getChildren().add(submit);
-        submit.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent e) {
-                if (!name.getText().isEmpty()) {
-                    myAnimation.stop();
-                }
+        submit.setOnAction(e -> {
+            if (!name.getText().isEmpty()) {
+                myAnimation.stop();
             }
         });
 
         updateScoreFile();
     }
-
     /**
      * This method simply writes whatever the highscore + initial combination is to the file, also sorts the score file as more scores are added
      */
     private void updateScoreFile() {
         try {
             FileWriter myWriter = new FileWriter("data/score.txt", true);
-            myWriter.write(playerTag + " " + scoreText);
+            myWriter.write(playerTag + " " + scoreText.getText());
             myWriter.close();
         } catch (IOException e) {
             System.out.println("An error occurred in writing your score lmfao you are ass");
@@ -480,6 +435,10 @@ import java.util.*;
         }
         sortScores();
     }
+
+    /**
+     * this method sorts the scores file so we can easily pull high schore
+     */
     private void sortScores(){
         try {
             BufferedReader br = new BufferedReader(new FileReader("data/score.txt"));
@@ -507,7 +466,7 @@ import java.util.*;
 
     /**
      * this method is responsible for updating many balls in the case of the multiball powerup
-     * @param elapsedTime
+     * @param elapsedTime time that has passed
      */
     private void updateManyBalls(double elapsedTime) {
         Iterator<Ball> itr = multiBalls.iterator();
@@ -582,7 +541,7 @@ import java.util.*;
 
     /**
      * This method updates the positioning of the ball
-     * @param elapsedTime
+     * @param elapsedTime time that has passed
      */
     private void updateBall(double elapsedTime) {
         myBall.setX(myBall.getX() + myBall.getBallSpeedX() * elapsedTime);
