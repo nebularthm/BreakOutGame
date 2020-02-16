@@ -287,7 +287,7 @@ import java.util.*;
      * this method doubles the size of the paddle
      */
     private void bigify() {
-        myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
+        myPaddle.setFitWidth(myPaddle.getFitWidth() * 2);
     }
 
 
@@ -460,7 +460,6 @@ import java.util.*;
         root.getChildren().clear();
         populateRoot(root,SIZE,SIZE,allLevelPaths.get(curLevel-1));
     }
-
     /**
      * this handles the win condition, in terms of returning the screen
      */
@@ -481,7 +480,6 @@ import java.util.*;
             }
         });
         //TODO: AP write/call the WIn Screen method here
-
     }
 
     /**
@@ -687,7 +685,6 @@ import java.util.*;
         }
     }
 
-
     /**
      * counts the bricks remaining in the grid
      * @return the int with bricks
@@ -703,9 +700,6 @@ import java.util.*;
         }
         return brickAmount;
         }
-
-        // What to do each time a key is pressed
-
     /**
      * handles what ahppens when the player presses a certain key
      * @param code the key the player pressed
@@ -724,8 +718,6 @@ import java.util.*;
             else if (code == KeyCode.DOWN) {
                 myPaddle.setY(myPaddle.getY() + myPaddle.getPadSpeedY());
             }
-
-
             // pause/restart animation
             if (code == KeyCode.SPACE) {
                 if (myAnimation.getStatus() == Animation.Status.RUNNING) {
@@ -741,6 +733,15 @@ import java.util.*;
                 myBall.setY(myScene.getHeight()/2);
                 myPaddle.setX(myScene.getWidth()/2);
                 myPaddle.setY(myScene.getHeight()/2);
+            }
+            if(code == KeyCode.O){
+                bigify();
+            }
+            if(code == KeyCode.M){
+                myBall.setSpeedX(myBall.getBallSpeedX()*2);
+                myBall.setSpeedY(myBall.getBallSpeedY()*2);
+                myPaddle.setPadSpeedX(myPaddle.getPadSpeedX()*2);
+                myPaddle.setPadSpeedY(myPaddle.getPadSpeedY()*2);
             }
             if(code == KeyCode.L){//This block of code gives the player full health on the presing of the L key
                 healthBar.setProgress(1);
@@ -770,7 +771,6 @@ import java.util.*;
                                 powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
                                 root.getChildren().add(powerUp);
                             }
-
                             return;
                         }
                     }
@@ -829,12 +829,7 @@ import java.util.*;
 public int getCurLevel(){
         return curLevel;
 }
-
-
     public static void main (String[] args) {
             launch(args);
         }
-
-
-
     }

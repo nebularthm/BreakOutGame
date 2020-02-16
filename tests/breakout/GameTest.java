@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -143,8 +144,14 @@ class GameTest extends DukeApplicationTest {
         assertEquals(myPaddle.getX(),myGame.SIZE/2);
         assertEquals(myPaddle.getX(),myGame.SIZE/2);
     }
+
+    /**
+     * this test tests the level skipping cheat keys 1-5, also tests the L key level skipper
+     */
     @Test
     public void testLevelSkippers(){
+        press(myScene,KeyCode.L);
+        assertEquals(2,myGame.getCurLevel());
     press(myScene,KeyCode.DIGIT1);
         assertEquals(1,myGame.getCurLevel());
         press(myScene,KeyCode.DIGIT2);
@@ -155,7 +162,28 @@ class GameTest extends DukeApplicationTest {
         assertEquals(4,myGame.getCurLevel());
         press(myScene,KeyCode.DIGIT5);
         assertEquals(5,myGame.getCurLevel());
+        press(myScene, KeyCode.L);
+        assertEquals(5,myGame.getCurLevel());
     }
+
+    /**
+     * This test check powerUps,cheat codes that are responsible for changing paddle/ball speed/size
+     */
+    @Test
+    public void testBiggerCheats(){
+        double beforeExpBall = myBall.getFitWidth();
+        press(myScene,KeyCode.B);
+        assertEquals(2 * beforeExpBall, myBall.getFitWidth());
+        double startPad = myPaddle.getFitWidth();
+        press(myScene, KeyCode.O);
+        assertEquals(2 * startPad, myPaddle.getFitWidth());
+        double padspeed = myPaddle.getPadSpeedX();  //because both x and y speed are updated, you only have to check for 1
+        double balspeed = myBall.getBallSpeedX();
+        press(myScene,KeyCode.M);
+        assertEquals(2 * balspeed, myBall.getBallSpeedX());
+        assertEquals( 2 * padspeed, myPaddle.getPadSpeedX());
+}
+
 
 
 }
