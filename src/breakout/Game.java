@@ -203,8 +203,7 @@ import java.util.Scanner;
             Image img = new Image(imgFile);
 
             myMenu = new Menu(img,SIZE/2,SIZE/2);
-            myMenu.setFitWidth(100);
-            myMenu.setFitHeight(100);
+
 
 
 
@@ -248,11 +247,12 @@ import java.util.Scanner;
             if(healthBar.getProgress() == 0){//this is if you run out of health
                 System.out.println("You lost the game and you suck");
                 root.getChildren().clear();
-                root.getChildren().add(myMenu);
+
                 // TODO: Figure out how to get the button on the menu
-//                Button ret = myMenu.getReset();
-//                root.getChildren().add(ret);
-                //myAnimation.stop();
+
+               root.getChildren().add(myMenu.getReset());
+               root.getChildren().add(myMenu.getBg());
+               myAnimation.stop();
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){

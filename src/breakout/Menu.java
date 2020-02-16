@@ -9,16 +9,26 @@ import javafx.scene.image.ImageView;
  * This class extemds imagevoew amd os cpmstictired wotj a picture, an x coordinate, and a y coordinate
  * The game will use an array of brick objectts to poplate the top portion of the screen
  */
-public class Menu extends ImageView {
+public class Menu  {
     Button reset;
+    ImageView bg;
     public Menu(Image img,int x, int y){
-        this.setImage(img);
-        this.setX(x);
-        this.setY(y);
-        reset = new Button("Reset",this);
+
+        this.bg = new ImageView(img);
+        this.bg.toBack();
+        this.bg.setX(x-200);
+        this.bg.setY(y-200);
+        this.bg.setFitWidth(400);
+        this.bg.setFitHeight(400);
+        this.reset = new Button("reset");
+        this.reset.toFront();
 
     }
     public Button getReset(){
         return reset;
+    }
+
+    public ImageView getBg() {
+        return bg;
     }
 }
