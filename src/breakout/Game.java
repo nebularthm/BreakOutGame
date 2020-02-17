@@ -446,7 +446,7 @@ import java.util.*;
             if(toKeep.equals("coop"))
                 isCoOP = true;
             else if(toKeep.equals("hard"))
-                hardModeMod = 2;
+                hardModeMod = true;
         root.getChildren().remove(selector);
         root.getChildren().remove(a);
         root.getChildren().remove(b);
