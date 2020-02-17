@@ -50,6 +50,7 @@ import java.util.*;
     public static final String PADDLE_PICTURE = "https://docs.microsoft.com/en-us/windows/uwp/get-started/images/monogame-tutorial-1.png";
     // some things we need to remember during our game
     public static final String BIGGERPADDLEIMAGE = "https://i.pinimg.com/originals/b4/92/d5/b492d594465b29bcbe7ff840fa18c896.png";
+    public static final String SECONDPADDLEIMAGE = "https://images-na.ssl-images-amazon.com/images/I/61-qw4NvomL._SL1500_.jpg";
         private static final double BALL_PENALTY = 0.25 ;
 
     //TODO: Find better Brick textures, all you have to do here is just add themm to the sources, and then read the file like how i showed you
@@ -82,6 +83,7 @@ import java.util.*;
         private Scene myScene;
         private Timeline myAnimation;
         private Paddle myPaddle;
+        private Paddle yourPaddle;
         private Ball myBall;
         private ArrayList<Ball> multiBalls;
         private ImageView boundary;
@@ -110,6 +112,10 @@ import java.util.*;
         private ImageView myLaser;
         private boolean isLaser = false;
         private int scoreKeeper;
+        private boolean isCoOP = false;
+        private boolean isHardMode = false;
+        private int hardModeMod;
+
 
 
     /**
@@ -169,10 +175,17 @@ import java.util.*;
         myBall.setSpeedY(myBlockSpeedY);
         rootie.getChildren().add(myBall);
         myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
-        myPaddle.setPadSpeedX(PADDLE_SPEED);
-        myPaddle.setPadSpeedY(PADDLE_SPEED);
+        myPaddle.setPadSpeedX(PADDLE_SPEED * 1/hardModeMod);
+        myPaddle.setPadSpeedY(PADDLE_SPEED * 1/hardModeMod);
         rootie.getChildren().add(myPaddle);
+        if(isCoOP == true){
+            yourPaddle = new Paddle(new Image(SECONDPADDLEIMAGE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 - 50 , height - 100);
+            yourPaddle.setPadSpeedX(PADDLE_SPEED);
+            yourPaddle.setPadSpeedY(PADDLE_SPEED);
+            rootie.getChildren().add(yourPaddle);
+        }
         level = new LevelBuilder(source,width,height);
+        level.setHardMode(isHardMode);
         level.setLevelAsList();
         for(ArrayList<Bricks> brickies:level.getLevelAsList()){
             for(Bricks brick: brickies){
@@ -186,6 +199,9 @@ import java.util.*;
         boundary.setId("boundary");
         root.getChildren().add(boundary);
         healthBar = new ProgressBar(1);
+        if(isHardMode == true){
+            healthBar.setProgress(.5);
+        }
         hLabel = new Label("Health",healthBar);
         hLabel.setLayoutY(7 * height/8);
         hLabel.setId("hLabel");
@@ -196,7 +212,39 @@ import java.util.*;
         scoreTrack.setLayoutX(width * 4/5);
         scoreTrack.setId("scoreTrack");
         rootie.getChildren().add(scoreTrack);
+        int maxScore = findMaxScore();
+        Text maxScoreText = new Text(maxScore + "");
+        Label maxScoreTrack = new Label("Highest Score: ", maxScoreText);
+        maxScoreTrack.setLayoutY(7*height/8);
+        maxScoreTrack.setLayoutX(2 * width/5);
+        maxScoreTrack.setId("maxScoreTrack");
+        rootie.getChildren().add(maxScoreTrack);
         isLaser = false;
+    }
+
+    /**
+     * This method returns the current higheest score in the Score.txt
+     * @return
+     */
+    private int findMaxScore() {
+        File scores = new File("data/score.txt");
+        Scanner scoreScanner = null;
+        int maxScore = 0;
+        try {
+             scoreScanner = new Scanner(scores);
+        } catch (FileNotFoundException e) {
+            return 0;
+        }
+        while(scoreScanner.hasNextLine()){
+            String scoreLine = scoreScanner.nextLine();
+            String [] scoreAndTag = scoreLine.split(" ");
+            int maxTemp = Integer.parseInt(scoreAndTag[scoreAndTag.length - 1]);
+            if(maxTemp >= maxScore){
+                maxScore = maxTemp;
+            }
+        }
+        return maxScore;
+
     }
 
     /**
@@ -234,6 +282,10 @@ import java.util.*;
             if(type.getType().equals(FASTPADDLE)){
                myPaddle.setPadSpeedX(myPaddle.getPadSpeedX() * 1.5);
                myPaddle.setPadSpeedY(myPaddle.getPadSpeedY() * 1.5);
+               if(isCoOP){
+                   yourPaddle.setPadSpeedX(yourPaddle.getPadSpeedX() * 1.5);
+                   yourPaddle.setPadSpeedY(yourPaddle.getPadSpeedY() * 1.5);
+               }
             }
             if(type.getType().equals(LEVELSKIP) && curLevel != maxLevel){
                 loadNextLevel();
@@ -290,6 +342,9 @@ import java.util.*;
      */
     private void bigify() {
         myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
+        if(isCoOP==true){
+            yourPaddle.setFitWidth(yourPaddle.getFitWidth() * 2);
+        }
     }
 
 
@@ -300,7 +355,7 @@ import java.util.*;
         public void start (Stage stage) {
             // attach scene to the stage and display it
 
-            myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(4) );
+            myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(0) );
             stage.setScene(myScene);
             stage.setTitle(TITLE);
             stage.show();
@@ -309,27 +364,104 @@ import java.util.*;
             myAnimation = new Timeline();
             myAnimation.setCycleCount(Timeline.INDEFINITE);
             myAnimation.getKeyFrames().add(frame);
-          /*  Menu rules = new Menu( new Image("https://lh3.googleusercontent.com/proxy/geW-yEDSed8CTWRWxRZ4z99HNo-a2CehJqTtv8KOL_3sXGMIqA0Dblp-4ymxpAIwPGmSxFDHJmMPSnUIu1pQ"),SIZE/2 - 200,SIZE/2 -200, "Continue")
-            rules.setFitWidth(400);
-            rules.setFitHeight(300);
-            root.getChildren().add(rules);
-            Button starter = rules.getReset();
+
+            Menu starter = new Menu(new Image("https://www.irishtimes.com/polopoly_fs/1.2116945.1424889844!/image/image.jpg_gen/derivatives/box_620_330/image.jpg"),SIZE/2 - 300,SIZE/2 -200,"Start");
+            starter.setFitWidth(600);
+            starter.setFitHeight(400);
             root.getChildren().add(starter);
-            starter.setLayoutX(170);
-            starter.setLayoutY(350);
-            starter.setOnAction(new EventHandler<ActionEvent>() {
+            Button play = starter.getReset();
+            root.getChildren().add(play);
+            play.setLayoutX(170);
+            play.setLayoutY(350);
+            play.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
-                    root.getChildren().clear();
-
+                   rulesMenu(starter);
                 }
             });
 
-           */
 
-            myAnimation.play();
         }
+        public void rulesMenu(Menu prevmenu){
+            root.getChildren().remove(prevmenu);
+            root.getChildren().remove(prevmenu.getReset());
+            Menu rules = new Menu(new Image("https://i.imgur.com/mcAYifg.png"),SIZE/2 - 200,SIZE/2 -200,"Start");
+            rules.setFitWidth(400);
+            rules.setFitHeight(400);
+            root.getChildren().add(rules);
+            Button play = rules.getReset();
+            root.getChildren().add(play);
+            play.setLayoutX(170);
+            play.setLayoutY(350);
+            play.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent e) {
+                    selectMenu(rules);
+                }
+            });
 
+        }
+    public void selectMenu(Menu prevmenu){
+        root.getChildren().remove(prevmenu);
+        root.getChildren().remove(prevmenu.getReset());
+        Menu selectoption = new Menu(new Image("https://i.imgur.com/HduUwse.png"),SIZE/2 - 200,SIZE/2 -200,"Start");
+        selectoption.setFitWidth(400);
+        selectoption.setFitHeight(400);
+        root.getChildren().add(selectoption);
+        Button normal = new Button("Normal");
+        Button hard = new Button("Hard");
+        Button coop = new Button("Co-Op");
+        root.getChildren().add(normal);
+        root.getChildren().add(hard);
+        root.getChildren().add(coop);
+        normal.setLayoutX(170);
+        normal.setLayoutY(200);
+        normal.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("normal",normal,hard,coop,selectoption);
+            }
+        });
+        hard.setLayoutX(170);
+        hard.setLayoutY(250);
+        hard.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("hard",normal,hard,coop,selectoption);
+            }
+        });
+        coop.setLayoutX(170);
+        coop.setLayoutY(300);
+        coop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("coop",normal,hard,coop,selectoption);
+
+            }
+        });
+    }
+
+    public void gamestarter(String toKeep, Button a, Button b, Button c, Menu selector){
+
+            if(toKeep.equals("coop"))
+                isCoOP = true;
+            else if(toKeep.equals("hard"))
+                hardModeMod = true;
+        root.getChildren().remove(selector);
+        root.getChildren().remove(a);
+        root.getChildren().remove(b);
+        root.getChildren().remove(c);
+        myAnimation.play();
+
+
+    }
+
+
+
+    /**
+     * this method put all of the level file paths into the levelsPAth data structure and returns it
+     * @return this method puts all of the level file paths into the levelsPath data structure and returns it
+     */
     private ArrayList<String> makeLevelPaths() {
             ArrayList<String> levelsPath = new ArrayList<>();
             File  levelDir = new File(LEVEL_SOURCE);
@@ -360,6 +492,12 @@ import java.util.*;
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
             //create boundary that ball cannot pass over
+        hardModeMod = 1;
+        if(isHardMode == true){
+            hardModeMod = 2;
+        }
+
+
             populateRoot(root,width,height,source);
             possiblePowerUps = allPowerUps();
             FileInputStream imgFile = null;
@@ -375,10 +513,11 @@ import java.util.*;
             myMenu.setFitWidth(400);
             myMenu.setFitHeight(300);
 
-
             possiblePowerUps = allPowerUps();
 
             // respond to
+
+
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
         }
@@ -390,6 +529,7 @@ import java.util.*;
      * @param elapsedTime time that has passed
      */
     void step (double elapsedTime) {
+
             // update attributes
             dropPowerUp(elapsedTime);
             updateBall(elapsedTime);
@@ -412,7 +552,7 @@ import java.util.*;
                 root.getChildren().clear();
 
                 // TODO: Figure out how to get the button on the menu
-
+                root.getChildren().add(myMenu);
                Button ret = myMenu.getReset();
                 root.getChildren().add(ret);
                 ret.setLayoutX(170);
@@ -674,8 +814,17 @@ import java.util.*;
     private void dropPowerUp(double elapsedTime) {
         if(isPowerUP) {
             powerUp.setY(powerUp.getY() + 50 * elapsedTime);
-            if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
+            if(isCoOP) {
+                if (powerUp.getBoundsInParent().intersects(yourPaddle.getBoundsInParent())) {
+                    powerUPEffect(powerUp);
+                    powerUp.setImage(null);
+                    isPowerUP = false;
+                    root.getChildren().remove(powerUp);
+                }
+            }
+            if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent()) ) {
                 powerUPEffect(powerUp);
+                powerUp.setImage(null);
                 isPowerUP = false;
                 root.getChildren().remove(powerUp);
             }
@@ -725,6 +874,18 @@ import java.util.*;
                 myPaddle.setY(myPaddle.getY() + myPaddle.getPadSpeedY());
             }
 
+            if(isCoOP == true) {
+                if (code == KeyCode.F1) {
+                    yourPaddle.setX(yourPaddle.getX() + yourPaddle.getPadSpeedX());
+                } else if (code == KeyCode.F2) {
+                    yourPaddle.setX(yourPaddle.getX() - yourPaddle.getPadSpeedX());
+                } else if (code == KeyCode.F3) {
+                    yourPaddle.setY(yourPaddle.getY() - yourPaddle.getPadSpeedY());
+                } else if (code == KeyCode.F4) {
+                    yourPaddle.setY(yourPaddle.getY() + yourPaddle.getPadSpeedY());
+                }
+            }
+
 
             // pause/restart animation
             if (code == KeyCode.SPACE) {
@@ -742,7 +903,7 @@ import java.util.*;
                 myPaddle.setX(myScene.getWidth()/2);
                 myPaddle.setY(myScene.getHeight()/2);
             }
-            if(code == KeyCode.L){//This block of code gives the player full health on the presing of the L key
+            if(code == KeyCode.H){//This block of code gives the player full health on the presing of the L key
                 healthBar.setProgress(1);
                 hLabel = new Label("Health", healthBar);
             }
@@ -763,6 +924,10 @@ import java.util.*;
             myBall.setSpeedY(myBall.getBallSpeedY()*2);
             myPaddle.setPadSpeedX(myPaddle.getPadSpeedX()*2);
             myPaddle.setPadSpeedY(myPaddle.getPadSpeedY()*2);
+            if(isCoOP == true){
+                yourPaddle.setPadSpeedX(yourPaddle.getPadSpeedX()*2);
+                yourPaddle.setPadSpeedY(yourPaddle.getPadSpeedY()*2);
+            }
         }
 
         if(code == KeyCode.D){// we are going to break the first undamaged brick
@@ -836,7 +1001,12 @@ import java.util.*;
     public Group getRoot(){
         return root;
     }
-public int getCurLevel(){
+
+    /**
+     * for testing purposes, returns the current level
+     * @return
+     */
+    public int getCurLevel(){
         return curLevel;
 }
 

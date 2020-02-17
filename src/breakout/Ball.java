@@ -20,14 +20,33 @@ private double ballSpeedY;
     this.setY(y);
     this.setId("ball_is_life");
 }
-public void setSpeedX(double speed){
+
+    /**
+     * set the x speed of the ball
+     * @param speed
+     */
+    public void setSpeedX(double speed){
     ballSpeedX = speed;
 }
-public void setSpeedY(double speed){ballSpeedY = speed;}
 
+    /**
+     * set the y speed of the ball
+     * @param speed
+     */
+    public void setSpeedY(double speed){ballSpeedY = speed;}
+
+    /**
+     * get the x speed of the ball
+     * @return
+     */
     public double getBallSpeedX() {
         return ballSpeedX;
     }
+
+    /**
+     * get the y speed of the ball
+     * @return
+     */
     public double getBallSpeedY(){ return ballSpeedY;}
 
 

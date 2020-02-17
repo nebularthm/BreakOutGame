@@ -24,18 +24,34 @@ public class Paddle extends ImageView {
 
     }
 
+    /**
+     * adjust x speed of paddle
+     * @param padSpeedX
+     */
     public void setPadSpeedX(double padSpeedX) {
         this.padSpeedX = padSpeedX;
     }
 
+    /**
+     * get the x speed
+     * @return
+     */
     public double getPadSpeedX() {
         return padSpeedX;
     }
 
+    /**
+     * adjust the y sp-eed of paddle
+     * @param padSpeedY
+     */
     public void setPadSpeedY(double padSpeedY) {
         this.padSpeedY = padSpeedY;
     }
 
+    /**
+     * get the y speed of our paddle
+     * @return
+     */
     public double getPadSpeedY() {
         return padSpeedY;
     }
