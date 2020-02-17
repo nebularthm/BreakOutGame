@@ -175,7 +175,7 @@ import java.util.*;
         myPaddle.setPadSpeedX(PADDLE_SPEED);
         myPaddle.setPadSpeedY(PADDLE_SPEED);
         rootie.getChildren().add(myPaddle);
-        if(isCoOP = true){
+        if(isCoOP == true){
             yourPaddle = new Paddle(new Image(SECONDPADDLEIMAGE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 - 50 , height - 100);
             yourPaddle.setPadSpeedX(PADDLE_SPEED);
             yourPaddle.setPadSpeedY(PADDLE_SPEED);
@@ -303,7 +303,7 @@ import java.util.*;
      */
     private void bigify() {
         myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
-        if(isCoOP){
+        if(isCoOP==true){
             yourPaddle.setFitWidth(yourPaddle.getFitWidth() * 2);
         }
     }
