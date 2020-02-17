@@ -50,6 +50,7 @@ import java.util.*;
     public static final String PADDLE_PICTURE = "https://docs.microsoft.com/en-us/windows/uwp/get-started/images/monogame-tutorial-1.png";
     // some things we need to remember during our game
     public static final String BIGGERPADDLEIMAGE = "https://i.pinimg.com/originals/b4/92/d5/b492d594465b29bcbe7ff840fa18c896.png";
+    public static final String SECONDPADDLEIMAGE = "https://images-na.ssl-images-amazon.com/images/I/61-qw4NvomL._SL1500_.jpg";
         private static final double BALL_PENALTY = 0.25 ;
 
     //TODO: Find better Brick textures, all you have to do here is just add themm to the sources, and then read the file like how i showed you
@@ -82,6 +83,7 @@ import java.util.*;
         private Scene myScene;
         private Timeline myAnimation;
         private Paddle myPaddle;
+        private Paddle yourPaddle;
         private Ball myBall;
         private ArrayList<Ball> multiBalls;
         private ImageView boundary;
@@ -110,6 +112,7 @@ import java.util.*;
         private ImageView myLaser;
         private boolean isLaser = false;
         private int scoreKeeper;
+        private boolean isCoOP = false;
 
 
     /**
@@ -172,6 +175,12 @@ import java.util.*;
         myPaddle.setPadSpeedX(PADDLE_SPEED);
         myPaddle.setPadSpeedY(PADDLE_SPEED);
         rootie.getChildren().add(myPaddle);
+        if(isCoOP = true){
+            yourPaddle = new Paddle(new Image(SECONDPADDLEIMAGE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 - 50 , height - 100);
+            yourPaddle.setPadSpeedX(PADDLE_SPEED);
+            yourPaddle.setPadSpeedY(PADDLE_SPEED);
+            rootie.getChildren().add(yourPaddle);
+        }
         level = new LevelBuilder(source,width,height);
         level.setLevelAsList();
         for(ArrayList<Bricks> brickies:level.getLevelAsList()){
@@ -234,6 +243,10 @@ import java.util.*;
             if(type.getType().equals(FASTPADDLE)){
                myPaddle.setPadSpeedX(myPaddle.getPadSpeedX() * 1.5);
                myPaddle.setPadSpeedY(myPaddle.getPadSpeedY() * 1.5);
+               if(isCoOP){
+                   yourPaddle.setPadSpeedX(yourPaddle.getPadSpeedX() * 1.5);
+                   yourPaddle.setPadSpeedY(yourPaddle.getPadSpeedY() * 1.5);
+               }
             }
             if(type.getType().equals(LEVELSKIP) && curLevel != maxLevel){
                 loadNextLevel();
@@ -290,6 +303,9 @@ import java.util.*;
      */
     private void bigify() {
         myPaddle.setFitWidth(myPaddle.getImage().getWidth() * 2);
+        if(isCoOP){
+            yourPaddle.setFitWidth(yourPaddle.getFitWidth() * 2);
+        }
     }
 
 
@@ -330,6 +346,10 @@ import java.util.*;
             myAnimation.play();
         }
 
+    /**
+     * this method put all of the level file paths into the levelsPAth data structure and returns it
+     * @return this method puts all of the level file paths into the levelsPath data structure and returns it
+     */
     private ArrayList<String> makeLevelPaths() {
             ArrayList<String> levelsPath = new ArrayList<>();
             File  levelDir = new File(LEVEL_SOURCE);
@@ -674,8 +694,15 @@ import java.util.*;
     private void dropPowerUp(double elapsedTime) {
         if(isPowerUP) {
             powerUp.setY(powerUp.getY() + 50 * elapsedTime);
-            if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
+            if(powerUp.getBoundsInParent().intersects(yourPaddle.getBoundsInParent())){
                 powerUPEffect(powerUp);
+                powerUp.setImage(null);
+                isPowerUP = false;
+                root.getChildren().remove(powerUp);
+            }
+            if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent()) ) {
+                powerUPEffect(powerUp);
+                powerUp.setImage(null);
                 isPowerUP = false;
                 root.getChildren().remove(powerUp);
             }
@@ -763,6 +790,10 @@ import java.util.*;
             myBall.setSpeedY(myBall.getBallSpeedY()*2);
             myPaddle.setPadSpeedX(myPaddle.getPadSpeedX()*2);
             myPaddle.setPadSpeedY(myPaddle.getPadSpeedY()*2);
+            if(isCoOP == true){
+                yourPaddle.setPadSpeedX(yourPaddle.getPadSpeedX()*2);
+                yourPaddle.setPadSpeedY(yourPaddle.getPadSpeedY()*2);
+            }
         }
 
         if(code == KeyCode.D){// we are going to break the first undamaged brick
