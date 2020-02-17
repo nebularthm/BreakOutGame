@@ -26,6 +26,8 @@ public class LevelBuilder {
     private static final String PURP = "purple";
     private static final String BLACK = "black";
     private ArrayList<ArrayList<Bricks>> levelAsList;
+    private boolean hardMode = false;
+    private int healthMod;
 
     private Bricks [][] level;
     LevelBuilder(String source, int width, int height){
@@ -47,6 +49,7 @@ public class LevelBuilder {
         catch(FileNotFoundException e){
             return new Bricks [0][0];
         }
+        setHealthMod();
         int i = 0;
         while(levelScanner.hasNextLine()){
             int j = 0;
@@ -70,30 +73,30 @@ public class LevelBuilder {
     public Bricks makeBrick(String brickType,int i,int j,int width,int height) {
         if (brickType.toLowerCase().contains(GREEN)) {
             Image defaultBrick = new Image(GREEN_BRICK, 30, 30, false, false);
-            return new Bricks(defaultBrick, (.5 *i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),1);
+            return new Bricks(defaultBrick, (.5 *i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),1 *healthMod);
         }
         if(brickType.toLowerCase().contains(BLUE)){
             Image blueBrick = new Image(BLUE_BRICK, 30, 30, false, false);
-            return new Bricks(blueBrick, (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),2);
+            return new Bricks(blueBrick, (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),2 * healthMod);
         }
         if(brickType.toLowerCase().contains(ORANGE)){
             Image oranBrick = new Image(Orange_BRICK, 30, 30, false, false);
-            return new Bricks(oranBrick, (.5 * i * width / BRICK_AMOUNT), ( .5 * j * height / BRICK_AMOUNT),3);
+            return new Bricks(oranBrick, (.5 * i * width / BRICK_AMOUNT), ( .5 * j * height / BRICK_AMOUNT),3 * healthMod);
         }
         if(brickType.toLowerCase().contains(RED)){
             Image redBrick = new Image(RED_BRICK, 30, 30, false, false);
-            return new Bricks(redBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),4);
+            return new Bricks(redBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),4 * healthMod);
         }
         if(brickType.toLowerCase().contains(WHITE)){
             Image whiteBrick = new Image(White_BRICK, 30, 30, false, false);
-            return new Bricks(whiteBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),5);
+            return new Bricks(whiteBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),5 * healthMod);
         }
         if(brickType.toLowerCase().contains(PURP)){
             Image purpBrick = new Image(PURPBRICK, 30, 30, false, false);
-            return new Bricks(purpBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),6);
+            return new Bricks(purpBrick,  (.5 * i * width / BRICK_AMOUNT),  ( .5 * j * height / BRICK_AMOUNT),6 * healthMod);
         }
         Image blackBrick = new Image(BLACK_BRICK, 30, 30, false, false);
-        return new Bricks(blackBrick,  (.5 * i * width / BRICK_AMOUNT), ( .5 * j * height / BRICK_AMOUNT),6);
+        return new Bricks(blackBrick,  (.5 * i * width / BRICK_AMOUNT), ( .5 * j * height / BRICK_AMOUNT),6 * healthMod);
 
     }
     public  ArrayList<ArrayList<Bricks>> twoDArrayToList(Bricks [][] twoDArray) {
@@ -120,5 +123,17 @@ public class LevelBuilder {
 
     public ArrayList<ArrayList<Bricks>> getLevelAsList() {
        return levelAsList;
+    }
+    public void setHardMode(boolean difficulty){
+        hardMode = difficulty;
+    }
+    private void setHealthMod(){
+        if (hardMode == false){
+            healthMod = 1;
+        }
+        else{
+            healthMod = 2;
+        }
+
     }
 }

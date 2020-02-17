@@ -113,6 +113,8 @@ import java.util.*;
         private boolean isLaser = false;
         private int scoreKeeper;
         private boolean isCoOP = false;
+        private boolean isHardMode = false;
+        private int hardModeMod;
 
 
     /**
@@ -172,8 +174,8 @@ import java.util.*;
         myBall.setSpeedY(myBlockSpeedY);
         rootie.getChildren().add(myBall);
         myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
-        myPaddle.setPadSpeedX(PADDLE_SPEED);
-        myPaddle.setPadSpeedY(PADDLE_SPEED);
+        myPaddle.setPadSpeedX(PADDLE_SPEED * 1/hardModeMod);
+        myPaddle.setPadSpeedY(PADDLE_SPEED * 1/hardModeMod);
         rootie.getChildren().add(myPaddle);
         if(isCoOP == true){
             yourPaddle = new Paddle(new Image(SECONDPADDLEIMAGE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 - 50 , height - 100);
@@ -182,6 +184,7 @@ import java.util.*;
             rootie.getChildren().add(yourPaddle);
         }
         level = new LevelBuilder(source,width,height);
+        level.setHardMode(isHardMode);
         level.setLevelAsList();
         for(ArrayList<Bricks> brickies:level.getLevelAsList()){
             for(Bricks brick: brickies){
@@ -195,6 +198,9 @@ import java.util.*;
         boundary.setId("boundary");
         root.getChildren().add(boundary);
         healthBar = new ProgressBar(1);
+        if(isHardMode == true){
+            healthBar.setProgress(.5);
+        }
         hLabel = new Label("Health",healthBar);
         hLabel.setLayoutY(7 * height/8);
         hLabel.setId("hLabel");
@@ -389,7 +395,10 @@ import java.util.*;
                 e.printStackTrace();
             }
             Image img = new Image(imgFile);
-
+            hardModeMod = 1;
+            if(isHardMode == true){
+                hardModeMod = 2;
+            }
 
             myMenu = new Menu(img,SIZE/2 - 200,SIZE/2 -200, "Retry");
             myMenu.setFitWidth(400);

@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 public class Bricks extends ImageView {
     private int health;
     private Boolean destroyed = false;
+    private boolean hardMode = false;
     public Bricks(Image brickpic, double x, double  y, int hp){
         this.setImage(brickpic);
         this.setX(x);
@@ -30,5 +31,6 @@ public class Bricks extends ImageView {
     public void setHealth(int hp){
         health = hp;
     }
+
 
 }
