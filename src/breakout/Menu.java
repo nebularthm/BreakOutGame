@@ -12,6 +12,14 @@ import javafx.scene.image.ImageView;
 public class Menu extends ImageView {
     Button reset;
     ImageView bg;
+
+    /**
+     * consturcts amenu based on an image or text
+     * @param img
+     * @param x
+     * @param y
+     * @param text
+     */
     public Menu(Image img,int x, int y, String text){
         this.setImage(img);
         this.setX(x);
@@ -20,9 +28,19 @@ public class Menu extends ImageView {
         this.reset.setMaxSize(100, 200);
 
     }
+
+    /**
+     * gets the resset button field for a given menu
+     * @return
+     */
     public Button getReset(){
         return reset;
     }
+
+    /**
+     * gets the actua background image for a given menu
+     * @return
+     */
     public ImageView getBg() {
         return bg;
     }

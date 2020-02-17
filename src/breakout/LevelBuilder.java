@@ -30,6 +30,13 @@ public class LevelBuilder {
     private int healthMod;
 
     private Bricks [][] level;
+
+    /**
+     * constructor for the Levelbuilder,
+     * @param source
+     * @param width
+     * @param height
+     */
     LevelBuilder(String source, int width, int height){
         this.level = levelReader(source, width, height);
 
@@ -99,6 +106,12 @@ public class LevelBuilder {
         return new Bricks(blackBrick,  (.5 * i * width / BRICK_AMOUNT), ( .5 * j * height / BRICK_AMOUNT),6 * healthMod);
 
     }
+
+    /**
+     * converts the brick representation of the level into a 2d array list for easier modifciation
+     * @param twoDArray
+     * @return
+     */
     public  ArrayList<ArrayList<Bricks>> twoDArrayToList(Bricks [][] twoDArray) {
         ArrayList<ArrayList<Bricks>> list = new ArrayList<>();
         for (Bricks [] array : twoDArray) {
@@ -120,13 +133,25 @@ public class LevelBuilder {
         this.levelAsList = twoDArrayToList(level);
     }
 
-
+    /**
+     * gets the array;list representation of the level grid, easy to modify
+     * @return
+     */
     public ArrayList<ArrayList<Bricks>> getLevelAsList() {
        return levelAsList;
     }
+
+    /**
+     * adjusts level configuration based on whether its hard mode
+     * @param difficulty
+     */
     public void setHardMode(boolean difficulty){
         hardMode = difficulty;
     }
+
+    /**
+     * depending on the mode, adjust how much health each brick will have
+     */
     private void setHealthMod(){
         if (hardMode == false){
             healthMod = 1;

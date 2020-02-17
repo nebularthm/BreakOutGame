@@ -24,6 +24,10 @@ public class PowerUp extends ImageView {
         type = typeOfPower;
     }
 
+    /**
+     * get the type of powerUp this is  
+     * @return
+     */
     public String getType() {
         return type;
     }

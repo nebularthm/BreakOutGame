@@ -905,7 +905,12 @@ import java.util.*;
     public Group getRoot(){
         return root;
     }
-public int getCurLevel(){
+
+    /**
+     * for testing purposes, returns the current level
+     * @return
+     */
+    public int getCurLevel(){
         return curLevel;
 }
 
