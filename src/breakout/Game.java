@@ -211,7 +211,39 @@ import java.util.*;
         scoreTrack.setLayoutX(width * 4/5);
         scoreTrack.setId("scoreTrack");
         rootie.getChildren().add(scoreTrack);
+        int maxScore = findMaxScore();
+        Text maxScoreText = new Text(maxScore + "");
+        Label maxScoreTrack = new Label("Highest Score: ", maxScoreText);
+        maxScoreTrack.setLayoutY(7*height/8);
+        maxScoreTrack.setLayoutX(2 * width/5);
+        maxScoreTrack.setId("maxScoreTrack");
+        rootie.getChildren().add(maxScoreTrack);
         isLaser = false;
+    }
+
+    /**
+     * This method returns the current higheest score in the Score.txt
+     * @return
+     */
+    private int findMaxScore() {
+        File scores = new File("data/score.txt");
+        Scanner scoreScanner = null;
+        int maxScore = 0;
+        try {
+             scoreScanner = new Scanner(scores);
+        } catch (FileNotFoundException e) {
+            return 0;
+        }
+        while(scoreScanner.hasNextLine()){
+            String scoreLine = scoreScanner.nextLine();
+            String [] scoreAndTag = scoreLine.split(" ");
+            int maxTemp = Integer.parseInt(scoreAndTag[scoreAndTag.length - 1]);
+            if(maxTemp >= maxScore){
+                maxScore = maxTemp;
+            }
+        }
+        return maxScore;
+
     }
 
     /**
@@ -331,24 +363,6 @@ import java.util.*;
             myAnimation = new Timeline();
             myAnimation.setCycleCount(Timeline.INDEFINITE);
             myAnimation.getKeyFrames().add(frame);
-          /*  Menu rules = new Menu( new Image("https://lh3.googleusercontent.com/proxy/geW-yEDSed8CTWRWxRZ4z99HNo-a2CehJqTtv8KOL_3sXGMIqA0Dblp-4ymxpAIwPGmSxFDHJmMPSnUIu1pQ"),SIZE/2 - 200,SIZE/2 -200, "Continue")
-            rules.setFitWidth(400);
-            rules.setFitHeight(300);
-            root.getChildren().add(rules);
-            Button starter = rules.getReset();
-            root.getChildren().add(starter);
-            starter.setLayoutX(170);
-            starter.setLayoutY(350);
-            starter.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    root.getChildren().clear();
-
-                }
-            });
-
-           */
-
             myAnimation.play();
         }
 
@@ -386,6 +400,10 @@ import java.util.*;
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
             //create boundary that ball cannot pass over
+        hardModeMod = 1;
+        if(isHardMode == true){
+            hardModeMod = 2;
+        }
             populateRoot(root,width,height,source);
             possiblePowerUps = allPowerUps();
             FileInputStream imgFile = null;
@@ -395,10 +413,7 @@ import java.util.*;
                 e.printStackTrace();
             }
             Image img = new Image(imgFile);
-            hardModeMod = 1;
-            if(isHardMode == true){
-                hardModeMod = 2;
-            }
+
 
             myMenu = new Menu(img,SIZE/2 - 200,SIZE/2 -200, "Retry");
             myMenu.setFitWidth(400);
@@ -703,11 +718,13 @@ import java.util.*;
     private void dropPowerUp(double elapsedTime) {
         if(isPowerUP) {
             powerUp.setY(powerUp.getY() + 50 * elapsedTime);
-            if(powerUp.getBoundsInParent().intersects(yourPaddle.getBoundsInParent())){
-                powerUPEffect(powerUp);
-                powerUp.setImage(null);
-                isPowerUP = false;
-                root.getChildren().remove(powerUp);
+            if(isCoOP) {
+                if (powerUp.getBoundsInParent().intersects(yourPaddle.getBoundsInParent())) {
+                    powerUPEffect(powerUp);
+                    powerUp.setImage(null);
+                    isPowerUP = false;
+                    root.getChildren().remove(powerUp);
+                }
             }
             if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent()) ) {
                 powerUPEffect(powerUp);
