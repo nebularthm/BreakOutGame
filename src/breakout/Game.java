@@ -117,6 +117,7 @@ import java.util.*;
         private int hardModeMod;
 
 
+
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
      * @return an arrayList of all of the powerUIps
@@ -354,7 +355,7 @@ import java.util.*;
         public void start (Stage stage) {
             // attach scene to the stage and display it
 
-            myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(4) );
+            myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(0) );
             stage.setScene(myScene);
             stage.setTitle(TITLE);
             stage.show();
@@ -363,8 +364,99 @@ import java.util.*;
             myAnimation = new Timeline();
             myAnimation.setCycleCount(Timeline.INDEFINITE);
             myAnimation.getKeyFrames().add(frame);
-            myAnimation.play();
+
+            Menu starter = new Menu(new Image("https://www.irishtimes.com/polopoly_fs/1.2116945.1424889844!/image/image.jpg_gen/derivatives/box_620_330/image.jpg"),SIZE/2 - 300,SIZE/2 -200,"Start");
+            starter.setFitWidth(600);
+            starter.setFitHeight(400);
+            root.getChildren().add(starter);
+            Button play = starter.getReset();
+            root.getChildren().add(play);
+            play.setLayoutX(170);
+            play.setLayoutY(350);
+            play.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent e) {
+                   rulesMenu(starter);
+                }
+            });
+
+
         }
+        public void rulesMenu(Menu prevmenu){
+            root.getChildren().remove(prevmenu);
+            root.getChildren().remove(prevmenu.getReset());
+            Menu rules = new Menu(new Image("https://i.imgur.com/mcAYifg.png"),SIZE/2 - 200,SIZE/2 -200,"Start");
+            rules.setFitWidth(400);
+            rules.setFitHeight(400);
+            root.getChildren().add(rules);
+            Button play = rules.getReset();
+            root.getChildren().add(play);
+            play.setLayoutX(170);
+            play.setLayoutY(350);
+            play.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent e) {
+                    selectMenu(rules);
+                }
+            });
+
+        }
+    public void selectMenu(Menu prevmenu){
+        root.getChildren().remove(prevmenu);
+        root.getChildren().remove(prevmenu.getReset());
+        Menu selectoption = new Menu(new Image("https://i.imgur.com/HduUwse.png"),SIZE/2 - 200,SIZE/2 -200,"Start");
+        selectoption.setFitWidth(400);
+        selectoption.setFitHeight(400);
+        root.getChildren().add(selectoption);
+        Button normal = new Button("Normal");
+        Button hard = new Button("Hard");
+        Button coop = new Button("Co-Op");
+        root.getChildren().add(normal);
+        root.getChildren().add(hard);
+        root.getChildren().add(coop);
+        normal.setLayoutX(170);
+        normal.setLayoutY(200);
+        normal.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("normal",normal,hard,coop,selectoption);
+            }
+        });
+        hard.setLayoutX(170);
+        hard.setLayoutY(250);
+        hard.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("hard",normal,hard,coop,selectoption);
+            }
+        });
+        coop.setLayoutX(170);
+        coop.setLayoutY(300);
+        coop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("coop",normal,hard,coop,selectoption);
+
+            }
+        });
+    }
+
+    public void gamestarter(String toKeep, Button a, Button b, Button c, Menu selector){
+
+            if(toKeep.equals("coop"))
+                isCoOP = true;
+            else if(toKeep.equals("hard"))
+                hardModeMod = 2;
+        root.getChildren().remove(selector);
+        root.getChildren().remove(a);
+        root.getChildren().remove(b);
+        root.getChildren().remove(c);
+        myAnimation.play();
+
+
+    }
+
+
 
     /**
      * this method put all of the level file paths into the levelsPAth data structure and returns it
@@ -404,6 +496,8 @@ import java.util.*;
         if(isHardMode == true){
             hardModeMod = 2;
         }
+
+
             populateRoot(root,width,height,source);
             possiblePowerUps = allPowerUps();
             FileInputStream imgFile = null;
@@ -419,10 +513,11 @@ import java.util.*;
             myMenu.setFitWidth(400);
             myMenu.setFitHeight(300);
 
-
             possiblePowerUps = allPowerUps();
 
             // respond to
+
+
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
         }
@@ -434,6 +529,7 @@ import java.util.*;
      * @param elapsedTime time that has passed
      */
     void step (double elapsedTime) {
+
             // update attributes
             dropPowerUp(elapsedTime);
             updateBall(elapsedTime);
@@ -456,7 +552,7 @@ import java.util.*;
                 root.getChildren().clear();
 
                 // TODO: Figure out how to get the button on the menu
-
+                root.getChildren().add(myMenu);
                Button ret = myMenu.getReset();
                 root.getChildren().add(ret);
                 ret.setLayoutX(170);
