@@ -93,12 +93,40 @@ If the ball is going too fast, there will be a "piercing" effect observed someti
 
 In Hard Mode, both users cannot press a movement or cheat key at the exact same time, because these events willbe registered as 1 concurrent button press and the action will consequently not be done. As explained in the rules section, Co-Op is a team based exercise that is centered around communication. You can't just make changes willy nilly when working with a team, you have to be considerate of how they move as well
 
+### PowerUps:
+Bigger Paddle- Indicated by Circle P, doubles the size of the Paddle
+
+Heal-  Heals you be 25%
+
+Laser- Once per game, creates vertical laser that does periodic damage to all bricks in a column, second best powerUp in the game
+
+TurboMode- Increasesspeed of the game by a factor of 5, really good when comboed with Bigger Paddle
+
+Faster Ball- Increases ball speed
+
+Faster PAddle- Increases paddle speed, but useless with bigger paddle. Necessary for hard Mode
+
+Skip Level- Skips this level. If at last level, wins you the Game
+
+Multi Ball- Creates 5 balls that do not deal damage to the player when entering restricted zone. These balls will be effected by increase damage powerUps, but not by powerUps that increase ball speed or cheat codes that increase Ball Size
+
+Slow Mode- Essentially a debuff, causes the game to run at 10% speed, useful if you want to talk out strats in Co-Op
+
+Double Damage- Double the damage the ball deals to bricks
+
+
+
+
 Extra credit:
 
 Extra features added to this game were hard mode a Co-Op play
 
+Co-Op- Play with 1 other player and  tactically clear the game. Currently Co-Op is played on Normal difficulty
+
+Hard Mode- PAddle moves half as quickly and bricks have twice as much health, while you have half as much health to start with. Good luck. 
+
 ### Notes/Assumptions
-Features Implemented by Michael Williams: The Ball, Paddle, Levels/Bricks, PowerUps, Score tracking, Health Bar tracking, restricted Zone, Co-Op, Hard Mode, General File I/O, Cheat Keys
+Features Implemented by Michael Williams: The Ball, Paddle, all of theLevels/Bricks, all of the PowerUps, Score tracking, Health Bar tracking, restricted Zone, Co-Op, Hard Mode, General File I/O,all of Cheat Keys
 
 
 ### Impressions
