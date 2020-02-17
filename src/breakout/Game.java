@@ -752,6 +752,18 @@ import java.util.*;
                 myPaddle.setY(myPaddle.getY() + myPaddle.getPadSpeedY());
             }
 
+            if(isCoOP == true) {
+                if (code == KeyCode.F1) {
+                    yourPaddle.setX(yourPaddle.getX() + yourPaddle.getPadSpeedX());
+                } else if (code == KeyCode.F2) {
+                    yourPaddle.setX(yourPaddle.getX() - yourPaddle.getPadSpeedX());
+                } else if (code == KeyCode.F3) {
+                    yourPaddle.setY(yourPaddle.getY() - yourPaddle.getPadSpeedY());
+                } else if (code == KeyCode.F4) {
+                    yourPaddle.setY(yourPaddle.getY() + yourPaddle.getPadSpeedY());
+                }
+            }
+
 
             // pause/restart animation
             if (code == KeyCode.SPACE) {
