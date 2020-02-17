@@ -57,8 +57,9 @@ import java.util.*;
 
     //These URL's correspond to paddle Images
     private static final String  LASERIMAGE = "https://labs.phaser.io/assets/animations/lazer/lazer_01.png";
+    private static final String LASERSOURCE = "https://st2.depositphotos.com/5205783/9032/v/950/depositphotos_90328212-stock-illustration-logo-abstract-circle-l-design.jpg";
     private static final String MULTIBALLIMAGE = "https://www.logolynx.com/images/logolynx/c3/c3fc5f02c40e5e729e646a2ca97871ca.jpeg";
-    private static final String LEVELSKIPIMAGE = "https://lh3.googleusercontent.com/proxy/YHqYDsLvTKimMM9CdmN7NP4foZtIrQDY-S_9aOSM2c4HFkJu4icxQz7XX8AM8r32ExbbkVKLTIGfD40C_vX5DoTpfJaWNXb1Ky5kXfvCcy_1LcsjEgF1";
+    private static final String LEVELSKIPIMAGE ="https://lever-client-logos.s3.amazonaws.com/865db2d7-cddc-4ab2-8f29-e41fe87b74d3-1526542591593.png";
     private static final String FASTBALLIMAGE = "https://i.pinimg.com/originals/a2/f4/14/a2f414b603535c3726a8403de2ed99db.png";
     private static final String FASTPADDLEIMAGE = "https://steamuserimages-a.akamaihd.net/ugc/874122921369426925/E1E9341ECFFFDD61C985EB5B3AE35672F878B523/";
     private static final String TURBOIMAGE = "https://image.shutterstock.com/image-vector/initial-company-circle-t-logo-260nw-752158675.jpg";
@@ -75,8 +76,7 @@ import java.util.*;
     private static final String SLOWMO = "slow";
     private static final String DOUBLEDMG = "doub";
     private static final String HEAL = "heal";
-
-
+    private static final String LASER = "laser";
 
     // some things we need to remember during our game
         private Scene myScene;
@@ -103,15 +103,18 @@ import java.util.*;
         private ArrayList<PowerUp> possiblePowerUps;
         private LevelBuilder level;
         private boolean areManyBalls = false;
-        private ArrayList<String> allLevelPaths;
-        private int maxLevel;
+        private ArrayList<String> allLevelPaths = makeLevelPaths();
+
+        private int maxLevel = allLevelPaths.size();
         private int curLevel;
-        private String playerTag;
+        private ImageView myLaser;
+        private boolean isLaser = false;
         private int scoreKeeper;
+
 
     /**
      * this method returns data structure containing all possible powerUps, and a powerUP will be randomly selected, see the README for more details on each powerup
-     * @return
+     * @return an arrayList of all of the powerUIps
      */
     private ArrayList<PowerUp> allPowerUps(){
         ArrayList<PowerUp> retList = new ArrayList<>();
@@ -139,15 +142,21 @@ import java.util.*;
         PowerUp padspeed = new PowerUp(new Image(FASTPADDLEIMAGE,30,30,false,false));
         padspeed.setType(FASTPADDLE);
         retList.add(padspeed);
+        PowerUp lasuh = new PowerUp(new Image(LASERSOURCE,30,30,false,false));
+        lasuh.setType(LASER);
+        retList.add(lasuh);
+        PowerUp skipper = new PowerUp(new Image(LEVELSKIPIMAGE,30,30,false,false));
+        skipper.setType(LEVELSKIP);
+        retList.add(skipper);
         return retList;
         }
 
     /**
      * this method essentially resets the level, tkes on a new root
-     * @param rootie
-     * @param width
-     * @param height
-     * @param source
+     * @param rootie root to be modified
+     * @param width width of scene
+     * @param height height of scene
+     * @param source source of the level
      */
     private void populateRoot(Group rootie,int width,int height, String source){
         // make some shapes, set their properties, and add them to the scene
@@ -187,45 +196,64 @@ import java.util.*;
         scoreTrack.setLayoutX(width * 4/5);
         scoreTrack.setId("scoreTrack");
         rootie.getChildren().add(scoreTrack);
+        isLaser = false;
     }
 
     /**
      *
      *gives a particular powerup, this method provides the effect of that powerup when touched by the paddle
-     * @param type
+     * @param type string representing type of powerUp
      */
 
-    private void powerUPEffect(String type){
-            if(type.equals(BIG_PADDLE)){
+    private void powerUPEffect( PowerUp type){
+            if(type.getType().equals(BIG_PADDLE)){
                 bigify();
             }
-            if(type.equals(MULTIBALL)){
+            if(type.getType().equals(MULTIBALL)){
                 multiply();
             }
-            if(type.equals(TURBOMODE)){
+            if(type.getType().equals(TURBOMODE)){
                 myAnimation.setRate(5);
             }
-            if(type.equals(SLOWMO)){
+            if(type.getType().equals(SLOWMO)){
                 myAnimation.setRate(0.1);
             }
-            if(type.equals(DOUBLEDMG)){
+            if(type.getType().equals(DOUBLEDMG)){
                 dmgPenalty *= 2;
             }
-            if(type.equals(HEAL)){
+            if(type.getType().equals(HEAL)){
                 if(healthBar.getProgress() < 1) {
                     healthBar.setProgress(healthBar.getProgress() + dmgPenalty);
                     hLabel = new Label("Health", healthBar);
                 }
             }
-            if(type.equals(FASTER_BALL)){
+            if(type.getType().equals(FASTER_BALL)){
                 myBall.setSpeedX(myBall.getBallSpeedX() * 1.5);
                 myBall.setSpeedY(myBall.getBallSpeedY() * 1.5);
             }
-            if(type.equals(FASTPADDLE)){
+            if(type.getType().equals(FASTPADDLE)){
                myPaddle.setPadSpeedX(myPaddle.getPadSpeedX() * 1.5);
                myPaddle.setPadSpeedY(myPaddle.getPadSpeedY() * 1.5);
             }
+            if(type.getType().equals(LEVELSKIP) && curLevel != maxLevel){
+                loadNextLevel();
+            }
+            if(type.getType().equals(LASER)){
+                loadLaser(powerUp);
+            }
         }
+
+    /**
+     * this method loads a lazer  based  on the x position of a given powerup, this laser will then be preesent for the entire level, and will periodically do damage to all the brickw in front of it,
+     * @param pow powerup object
+     */
+    private void loadLaser(PowerUp pow) {
+        isLaser = true;
+        myLaser = new ImageView((new Image(LASERIMAGE,20, 2 * myScene.getHeight()- boundary.getY(),false,false)));
+        myLaser.setX(pow.getX());
+
+        root.getChildren().add(myLaser);
+    }
 
     /**
      * this method adds 5 balls to the screen, biracial
@@ -244,7 +272,7 @@ import java.util.*;
 
     /**
      * This method returns a data structure data
-     * @return
+     * @return an arrayList containing 5 balls
      */
     private ArrayList<Ball> makeMoreBalls() {
         ArrayList<Ball> retList = new ArrayList<>();
@@ -271,9 +299,7 @@ import java.util.*;
         @Override
         public void start (Stage stage) {
             // attach scene to the stage and display it
-            allLevelPaths = makeLevelPaths();
-            curLevel = 5;
-            maxLevel = allLevelPaths.size();
+
             myScene = setupScene(SIZE, SIZE, BACKGROUND,allLevelPaths.get(4) );
             stage.setScene(myScene);
             stage.setTitle(TITLE);
@@ -316,54 +342,26 @@ import java.util.*;
 
 
     // Create the game's "scene": what shapes will be in the game and their starting properties
-        Scene setupScene (int width, int height, Paint background, String source) {
+
+    /**
+     * Sets up the scene/initial level
+     * @param width of scene
+     * @param height of scene
+     * @param background of scene
+     * @param source souce for level
+     * @return
+     */
+    Scene setupScene (int width, int height, Paint background, String source) {
             // create one top level collection to organize the things in the scene
             root = new Group();
-            // make some shapes, set their properties, and add them to the scene
-            Image ballImage = new Image(BALL_PICTURE,30,30,false,false);
-            myBall = new Ball(ballImage,width/2 - 15,height/2 +60);
-            dmgPenalty = 1;
-            myBlockSpeedX = BALL_SPEED;
-            myBlockSpeedY = BALL_SPEED;
-            myBall.setSpeedX(myBlockSpeedX);
-            myBall.setSpeedY(myBlockSpeedY);
-            root.getChildren().add(myBall);
-            myPaddle = new Paddle(new Image(PADDLE_PICTURE, BLOCK_SIZE + 100,BLOCK_SIZE,false,false),width/2 , height - 100);
-            myPaddle.setPadSpeedX(PADDLE_SPEED);
-            myPaddle.setPadSpeedY(PADDLE_SPEED);
-            root.getChildren().add(myPaddle);
+            curLevel = 1;
 
+            // make some shapes, set their properties, and add them to the scene
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
-
-            level = new LevelBuilder(source,width,height);
-            level.setLevelAsList();
-
-            for(ArrayList<Bricks> brickies:level.getLevelAsList()){
-                for(Bricks brick: brickies){
-                    root.getChildren().add(brick);
-                }
-            }
             //create boundary that ball cannot pass over
-            boundary = new ImageView();
-            boundary.setImage(new Image("https://i.redd.it/rkfe2i3pdqqx.jpg",myScene.getWidth(),BLOCK_SIZE,false,false));
-            boundary.setY(4 * height/5);
-            boundary.setId("boundary");
-            root.getChildren().add(boundary);
-            healthBar = new ProgressBar(1);
-            healthBarLabel = new HBox();//https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/progress.htm I am gonna use a ProgressBar to represent the health we have
-
-            hLabel = new Label("Health",healthBar);
-            hLabel.setLayoutY(7 * height/8);
-            hLabel.setId("hLabel");
-            root.getChildren().add(hLabel);
-            myScore = 0;
-            scoreText = new Text(myScore + "0");
-            scoreTrack = new Label("Score: ", scoreText);
-            scoreTrack.setLayoutY(7*height/8);
-            scoreTrack.setLayoutX(width * 4/5);
-            scoreTrack.setId("scoreTrack");
-            root.getChildren().add(scoreTrack);
+            populateRoot(root,width,height,source);
+            possiblePowerUps = allPowerUps();
             FileInputStream imgFile = null;
             try {
                 imgFile = new FileInputStream("data/Images/gameover.png");
@@ -371,6 +369,7 @@ import java.util.*;
                 e.printStackTrace();
             }
             Image img = new Image(imgFile);
+
 
             myMenu = new Menu(img,SIZE/2 - 200,SIZE/2 -200, "Retry");
             myMenu.setFitWidth(400);
@@ -388,16 +387,11 @@ import java.util.*;
 
     /**
      * this method handles the animation of the program
-     * @param elapsedTime
+     * @param elapsedTime time that has passed
      */
     void step (double elapsedTime) {
-
-
-
-
             // update attributes
             dropPowerUp(elapsedTime);
-
             updateBall(elapsedTime);
             if(multiBalls != null){
                 updateManyBalls(elapsedTime);
@@ -416,8 +410,9 @@ import java.util.*;
             }
             if(healthBar.getProgress() == 0){//this is if you run out of health, ie if you lost
                 root.getChildren().clear();
-                root.getChildren().add(myMenu);
+
                 // TODO: Figure out how to get the button on the menu
+
                Button ret = myMenu.getReset();
                 root.getChildren().add(ret);
                 ret.setLayoutX(170);
@@ -432,6 +427,7 @@ import java.util.*;
                 });
 
                 //myAnimation.stop();
+
             }
             //if you hit the paddle, bounce as if you hit the wall
             if(myBall.getBoundsInParent().intersects(myPaddle.getBoundsInParent())){
@@ -441,6 +437,9 @@ import java.util.*;
         }
             //check for case when you hit a brick
             updateBricks(myBall);
+            if(isLaser){
+                updateBricksImageView(myLaser);
+            }
             destroyBricks();
         if(brickCount() == 0){
             loadNextLevel();
@@ -454,7 +453,6 @@ import java.util.*;
     private void loadNextLevel() {
         scoreKeeper += myScore;
         if(curLevel == maxLevel){
-
             youWon();
             return;
         }
@@ -497,9 +495,7 @@ import java.util.*;
         name.setLayoutX(100);
         name.setLayoutY(150);
         name.setPrefWidth(200);
-        playerTag = name.getText();
         root.getChildren().add(name);
-
         Button submit = new Button("Submit");
         root.getChildren().add(submit);
         submit.setLayoutX(170);
@@ -516,7 +512,6 @@ import java.util.*;
         });
 
     }
-
     /**
      * This method simply writes whatever the highscore + initial combination is to the file, also sorts the score file as more scores are added
      */
@@ -531,6 +526,10 @@ import java.util.*;
         }
         sortScores();
     }
+
+    /**
+     * this method sorts the scores file so we can easily pull high schore
+     */
     private void sortScores(){
         try {
             BufferedReader br = new BufferedReader(new FileReader("data/score.txt"));
@@ -558,7 +557,7 @@ import java.util.*;
 
     /**
      * this method is responsible for updating many balls in the case of the multiball powerup
-     * @param elapsedTime
+     * @param elapsedTime time that has passed
      */
     private void updateManyBalls(double elapsedTime) {
         Iterator<Ball> itr = multiBalls.iterator();
@@ -607,6 +606,24 @@ import java.util.*;
     }
 
     /**
+     * this method is similar to update bricks, except it checks for collision based on a general imageView object, such as lasers or missles. USeful for future feature adding to this game
+     * @param immy Any imageview
+     */
+    private void updateBricksImageView(ImageView immy){
+        for(ArrayList<Bricks> brickies: level.getLevelAsList()){
+            for(Bricks brick: brickies){
+                if(immy.getBoundsInParent().intersects(brick.getBoundsInParent())){
+                    brick.updateHealth(dmgPenalty );
+                    brick.updateDestroyed();
+                    myScore += 10;
+                    scoreText.setText(myScore + "0");
+                    scoreTrack = new Label("Score: ",scoreText);
+                }
+            }
+        }
+    }
+
+    /**
      * This method handles the destruction of bricks
      */
     private void destroyBricks() {
@@ -618,6 +635,9 @@ import java.util.*;
                     brick.setImage(null);
                     itr.remove();
                     root.getChildren().remove(brick);
+                    myScore += 100;
+                    scoreText.setText(myScore + "0");
+                    scoreTrack = new Label("Score: ",scoreText);
                     if(isPowerUP == false) {
                         isPowerUP = true;
 
@@ -634,7 +654,7 @@ import java.util.*;
 
     /**
      * This method updates the positioning of the ball
-     * @param elapsedTime
+     * @param elapsedTime time that has passed
      */
     private void updateBall(double elapsedTime) {
         myBall.setX(myBall.getX() + myBall.getBallSpeedX() * elapsedTime);
@@ -655,12 +675,13 @@ import java.util.*;
         if(isPowerUP) {
             powerUp.setY(powerUp.getY() + 50 * elapsedTime);
             if (powerUp.getBoundsInParent().intersects(myPaddle.getBoundsInParent())) {
-                powerUPEffect(powerUp.getType());
+                powerUPEffect(powerUp);
                 isPowerUP = false;
                 root.getChildren().remove(powerUp);
             }
             if(powerUp.getBoundsInParent().intersects(boundary.getBoundsInParent())){
                 isPowerUP = false;
+                powerUp.setImage(null);
                 root.getChildren().remove(powerUp);
             }
         }
@@ -671,7 +692,7 @@ import java.util.*;
      * counts the bricks remaining in the grid
      * @return the int with bricks
      */
-    private int brickCount(){
+    public int brickCount(){
         int brickAmount = 0;
         for(ArrayList<Bricks> brickies:level.getLevelAsList()){
             Iterator<Bricks> itr = brickies.iterator();
@@ -725,7 +746,7 @@ import java.util.*;
                 healthBar.setProgress(1);
                 hLabel = new Label("Health", healthBar);
             }
-            if(code == KeyCode.P){
+            if(code == KeyCode.P && isPowerUP == false){
                 isPowerUP = true;
                 Random rand = new Random();
                 powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
@@ -734,21 +755,32 @@ import java.util.*;
             if(code == KeyCode.B){
                 myBall.setFitWidth(myBall.getFitWidth() * 2);
             }
-            if(code == KeyCode.D){// we are going to break the first undamaged brick
+        if(code == KeyCode.O){
+            bigify();
+        }
+        if(code == KeyCode.M){
+            myBall.setSpeedX(myBall.getBallSpeedX()*2);
+            myBall.setSpeedY(myBall.getBallSpeedY()*2);
+            myPaddle.setPadSpeedX(myPaddle.getPadSpeedX()*2);
+            myPaddle.setPadSpeedY(myPaddle.getPadSpeedY()*2);
+        }
+
+        if(code == KeyCode.D){// we are going to break the first undamaged brick
                 for(ArrayList<Bricks> brickies:level.getLevelAsList()){
                     Iterator<Bricks> itr = brickies.iterator();
                     while(itr.hasNext()){
                         Bricks brick = itr.next();
                         if(!brick.isDestroyed()){
                             brick.setImage(null);
-                            itr.remove();
                             root.getChildren().remove(brick);
+                            itr.remove();
                             if(isPowerUP == false) {
                                 isPowerUP = true;
                                 Random rand = new Random();
                                 powerUp = possiblePowerUps.get(rand.nextInt(possiblePowerUps.size()));
                                 root.getChildren().add(powerUp);
                             }
+
                             return;
                         }
                     }
@@ -767,8 +799,49 @@ import java.util.*;
             if(code == KeyCode.L){
                 loadNextLevel();
             }
+            if(code == KeyCode.DIGIT1){
+                curLevel = 0;
+                loadNextLevel();
         }
-        public static void main (String[] args) {
+        if(code == KeyCode.DIGIT2){
+            curLevel = 1;
+            loadNextLevel();
+        }
+        if(code == KeyCode.DIGIT3){
+            curLevel = 2;
+            loadNextLevel();
+        }
+        if(code == KeyCode.DIGIT4){
+            curLevel = 3;
+            loadNextLevel();
+        }
+        if(code == KeyCode.DIGIT5){
+            curLevel = 4;
+            loadNextLevel();
+        }
+        }
+
+    /**
+     * for testing purposs, gets our level
+     * @return
+     */
+    public LevelBuilder getLevel() {
+        return level;
+    }
+
+    /**
+     * for testing purposes, returns our root
+     * @return
+     */
+    public Group getRoot(){
+        return root;
+    }
+public int getCurLevel(){
+        return curLevel;
+}
+
+
+    public static void main (String[] args) {
             launch(args);
         }
 

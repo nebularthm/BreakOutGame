@@ -11,7 +11,7 @@ import javafx.scene.image.ImageView;
  */
 public class Menu extends ImageView {
     Button reset;
-
+    ImageView bg;
     public Menu(Image img,int x, int y, String text){
         this.setImage(img);
         this.setX(x);
@@ -22,5 +22,8 @@ public class Menu extends ImageView {
     }
     public Button getReset(){
         return reset;
+    }
+    public ImageView getBg() {
+        return bg;
     }
 }

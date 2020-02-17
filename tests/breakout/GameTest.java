@@ -4,7 +4,9 @@ package breakout;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -36,8 +38,13 @@ class GameTest extends DukeApplicationTest {
     private ArrayList<ArrayList<Bricks>> levelAsList;
     private boolean winCon = false;
     private PowerUp bigpaddie;
-    private String firstLevl = "data/level1.txt";
+    private String firstLevl = "data/levels/level1.txt";
+    private LevelBuilder myLevel;
 
+    /**
+     * for starting the test game
+     * @param stage where the game is played
+     */
     @Override
     public void start (Stage stage) {
         myScene = myGame.setupScene(Game.SIZE, Game.SIZE, Game.BACKGROUND, firstLevl);
@@ -48,33 +55,38 @@ class GameTest extends DukeApplicationTest {
         myBall = lookup("#ball_is_life").query();
         hLabel = lookup("#hLabel").query();
         scoreTrack = lookup("#scoreTrack").query();
+        myLevel = myGame.getLevel();
 
 
     }
 
+    /**
+     * this test checks for initial paddle position
+     */
     @Test
     public void testPaddleInitialPosition () {
-        assertEquals(Game.SIZE/2 - Game.BLOCK_SIZE/2, myPaddle.getX());
-        assertEquals(4 * Game.SIZE/5, myPaddle.getY());
-        assertEquals(Game.BLOCK_SIZE, myPaddle.getFitWidth());
-        assertEquals(Game.BLOCK_SIZE -60, myPaddle.getFitWidth());
+        assertEquals(Game.SIZE/2, myPaddle.getX());
+        assertEquals( Game.SIZE - 100, myPaddle.getY());
+        assertEquals(Game.BLOCK_SIZE + 100, myPaddle.getFitWidth());
+        assertEquals(Game.BLOCK_SIZE , myPaddle.getFitWidth());
     }
+
+
+    /**
+     * this test checks the ball initial posiiton
+     */
     @Test
     public void testBallInitialPosition () {
         assertEquals(Game.SIZE/2 - 15, myBall.getX());
         assertEquals(Game.SIZE/2 + 60, myBall.getY());
-
-        assertEquals(50,myBall.getBallSpeedX());
-    }/*
-    @Test
-    public void testBallInitialPosition () {
-        assertEquals(Game.SIZE/2 - 15, myBall.getX());
-        assertEquals(Game.SIZE/2 - 15, myBall.getY());
-        assertEquals(30, myBall.getWidth());
-        assertEquals(30, myBall.getHeight());
+        assertEquals(30, myBall.getFitHeight());
+        assertEquals(30, myBall.getFitWidth());
     }
-    */
 
+
+    /**
+     * this method tests the paddle motion
+     */
     @Test
     public void testPaddleMove () {
         // given mover is in middle of the scene
@@ -88,6 +100,10 @@ class GameTest extends DukeApplicationTest {
         assertEquals(190, myPaddle.getX());
         assertEquals(200, myPaddle.getY());
     }
+
+    /**
+     * this method tests the intial health and score positiining
+     */
     @Test
     public void testHealthAndScore(){
         assertEquals(7 * Game.SIZE/8, hLabel.getLayoutY());
@@ -95,6 +111,79 @@ class GameTest extends DukeApplicationTest {
         assertEquals(Game.SIZE * 4/5,scoreTrack.getLayoutX());
         assertEquals(Game.SIZE* 7/8, scoreTrack.getLayoutY());
     }
+
+    /**
+     * For this test, we test the removal logic of this game by testing what happens when the delete keyCode is pressed. If both values are the same, that means the brick is removed, because
+     * A powerUp is added right after, so if the reaming bricks equas the starting bricks, then you know that a brick was removed, because otherwise the remaining bricks would have more nodes in the actual root.
+     * Because this test uses the same logic, this test also functionally tests if bricks are deleted after a collision,
+     * so if the collision test works, and this test works, then this feature works
+     */
+    @Test
+    public void testBrickDestroyed(){
+        int startingBricks = myGame.brickCount();
+        press(myScene,KeyCode.D);
+        int remainBricks = myGame.brickCount();
+    assertEquals(startingBricks -1 ,remainBricks);
+        press(myScene,KeyCode.D);//test if it registers multiple keypresses or just one
+        int remainAfterdouble = myGame.brickCount();
+        assertEquals(startingBricks - 2, remainAfterdouble );
+        press(myScene,KeyCode.D);
+        int remainAftertrip = myGame.brickCount();
+        assertEquals(startingBricks - 3, remainAftertrip );
+
+    }
+
+    /**
+     * this test checks that the R key properly resets the posirtion of the ball and the paddle to their origins
+     */
+    @Test
+    public void testReset(){
+        press(myScene,KeyCode.R);
+        assertEquals(myBall.getX(),0);
+        assertEquals(myBall.getY(),myGame.SIZE/2);
+        assertEquals(myPaddle.getX(),myGame.SIZE/2);
+        assertEquals(myPaddle.getX(),myGame.SIZE/2);
+    }
+
+    /**
+     * this test tests the level skipping cheat keys 1-5, also tests the L key level skipper
+     */
+    @Test
+    public void testLevelSkippers(){
+        press(myScene,KeyCode.L);
+        assertEquals(2,myGame.getCurLevel());
+    press(myScene,KeyCode.DIGIT1);
+        assertEquals(1,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT2);
+        assertEquals(2,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT3);
+        assertEquals(3,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT4);
+        assertEquals(4,myGame.getCurLevel());
+        press(myScene,KeyCode.DIGIT5);
+        assertEquals(5,myGame.getCurLevel());
+        press(myScene, KeyCode.L);
+        assertEquals(5,myGame.getCurLevel());
+    }
+
+    /**
+     * This test check powerUps,cheat codes that are responsible for changing paddle/ball speed/size
+     */
+    @Test
+    public void testBiggerCheats(){
+        double beforeExpBall = myBall.getFitWidth();
+        press(myScene,KeyCode.B);
+        assertEquals(2 * beforeExpBall, myBall.getFitWidth());
+        double startPad = 260;//we klnow this
+        press(myScene, KeyCode.O);
+        assertEquals( startPad, myPaddle.getFitWidth());
+        double padspeed = myPaddle.getPadSpeedX();  //because both x and y speed are updated, you only have to check for 1
+        double balspeed = myBall.getBallSpeedX();
+        press(myScene,KeyCode.M);
+        assertEquals(2 * balspeed, myBall.getBallSpeedX());
+        assertEquals( 2 * padspeed, myPaddle.getPadSpeedX());
+}
+
 
 
 }
