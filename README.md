@@ -93,7 +93,7 @@ If the ball is going too fast, there will be a "piercing" effect observed someti
 
 In Hard Mode, both users cannot press a movement or cheat key at the exact same time, because these events willbe registered as 1 concurrent button press and the action will consequently not be done. As explained in the rules section, Co-Op is a team based exercise that is centered around communication. You can't just make changes willy nilly when working with a team, you have to be considerate of how they move as well
 
-Co-Op fails to launch 
+
 
 Extra credit:
 

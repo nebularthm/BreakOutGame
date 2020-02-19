@@ -28,9 +28,9 @@ import java.util.*;
 
 
 /**
-     * A simple frogger-like game.
+     * A SuperBreakout implementation
      *
-     * @author Robert C. Duvall
+     * @author Michael Williams, AP
      */
     public class Game extends Application {
         public static final String TITLE = "Super Breakout";
