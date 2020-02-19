@@ -110,6 +110,8 @@ class GameTest extends DukeApplicationTest {
         assertEquals(0,hLabel.getLayoutX());
         assertEquals(Game.SIZE * 4/5,scoreTrack.getLayoutX());
         assertEquals(Game.SIZE* 7/8, scoreTrack.getLayoutY());
+        ProgressBar newHealth = new ProgressBar(.5);
+
     }
 
     /**
