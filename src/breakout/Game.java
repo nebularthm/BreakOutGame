@@ -446,11 +446,13 @@ import java.util.*;
             if(toKeep.equals("coop"))
                 isCoOP = true;
             else if(toKeep.equals("hard"))
-                hardModeMod = true;
+                isHardMode = true;
         root.getChildren().remove(selector);
         root.getChildren().remove(a);
         root.getChildren().remove(b);
         root.getChildren().remove(c);
+        root.getChildren().clear();
+        populateRoot(root,(int)myScene.getWidth(),(int)myScene.getHeight(),allLevelPaths.get(0));
         myAnimation.play();
 
 
