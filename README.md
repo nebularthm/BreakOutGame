@@ -1,9 +1,8 @@
-game
-====
+ 
 
 This project implements the game of Breakout.
 
-Name: Michael Williams
+Name: Michael Williams, Aparimeya Taneja 
 
 ### Timeline
 
@@ -93,6 +92,7 @@ If the ball is going too fast, there will be a "piercing" effect observed someti
 
 In Hard Mode, both users cannot press a movement or cheat key at the exact same time, because these events willbe registered as 1 concurrent button press and the action will consequently not be done. As explained in the rules section, Co-Op is a team based exercise that is centered around communication. You can't just make changes willy nilly when working with a team, you have to be considerate of how they move as well
 
+ 
 ### PowerUps:
 Bigger Paddle- Indicated by Circle P, doubles the size of the Paddle
 
@@ -116,6 +116,9 @@ Double Damage- Double the damage the ball deals to bricks
 
 
 
+ 
+Co-Op fails to launch 
+ 
 
 Extra credit:
 
@@ -126,8 +129,11 @@ Co-Op- Play with 1 other player and  tactically clear the game. Currently Co-Op 
 Hard Mode- PAddle moves half as quickly and bricks have twice as much health, while you have half as much health to start with. Good luck. 
 
 ### Notes/Assumptions
-Features Implemented by Michael Williams: The Ball, Paddle, all of theLevels/Bricks, all of the PowerUps, Score tracking, Health Bar tracking, restricted Zone, Co-Op, Hard Mode, General File I/O,all of Cheat Keys
-
+ 
+ 
+Features Implemented by Michael Williams: The Ball, Paddle, Levels/Bricks, PowerUps, Score tracking, Health Bar tracking, restricted Zone, Co-Op, Hard Mode, General File I/O, Cheat Keys
+Features Implemented by AP: splash screens(rules etc.), some graphics, trajectory physics, score writing and submission, mode selector, level reset/retry, level builder and menu
+ 
 
 ### Impressions
 Overall Project was pretty fun, I do not have much experience with JavaFX,k so using a new technology was very interesting.
