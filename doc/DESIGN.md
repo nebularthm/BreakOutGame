@@ -1,11 +1,13 @@
 # Game Design Final
 ### Names
 Michael Williams
+Aparimeya Taneja
 ## Team Roles and Responsibilities
 
  * Team Member #1
 Michael Willams- Design and implement every aspect of gameplay such as ball, paddle, powwer ups, and levels. For this project, took role of lead developer and implementer.
- * Team Member #2
+ * Team Member #2 
+ AP - Method handling and refactoring. Initialized and set up tests. Role of designer?
 
 
 ## Design goals

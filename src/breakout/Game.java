@@ -382,7 +382,12 @@ import java.util.*;
 
 
         }
-        public void rulesMenu(Menu prevmenu){
+
+    /**
+     * Starts the rendering of the game menus, starting with the ruleset
+     * @param prevmenu passes the previous menu to first be removed
+     */
+    public void rulesMenu(Menu prevmenu){
             root.getChildren().remove(prevmenu);
             root.getChildren().remove(prevmenu.getReset());
             Menu rules = new Menu(new Image("https://i.imgur.com/mcAYifg.png"),SIZE/2 - 200,SIZE/2 -200,"Start");
@@ -401,6 +406,11 @@ import java.util.*;
             });
 
         }
+
+    /**
+     * Displays the game mode select screen
+     * @param prevmenu
+     */
     public void selectMenu(Menu prevmenu){
         root.getChildren().remove(prevmenu);
         root.getChildren().remove(prevmenu.getReset());
@@ -441,6 +451,14 @@ import java.util.*;
         });
     }
 
+    /**
+     * Clears root of all remaining menus and buttons and sets up the game config variables and starts the first level
+     * @param toKeep Which game mode the user selected
+     * @param a First button to be deleted
+     * @param b Second button to be deleted
+     * @param c Third button to be deleted
+     * @param selector Menu to be deleted/cleared
+     */
     public void gamestarter(String toKeep, Button a, Button b, Button c, Menu selector){
 
             if(toKeep.equals("coop"))
@@ -604,7 +622,7 @@ import java.util.*;
     }
 
     /**
-     * this handles the win condition, in terms of returning the screen
+     * Displays a screen telling the user they won
      */
     private void youWon() {
         root.getChildren().clear();
@@ -622,7 +640,7 @@ import java.util.*;
                 writeUserScore();
             }
         });
-        //TODO: AP write/call the WIn Screen method here
+
 
     }
 
