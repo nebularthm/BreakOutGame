@@ -404,7 +404,6 @@ import java.util.*;
                     selectMenu(rules);
                 }
             });
-
         }
 
     /**
@@ -507,7 +506,6 @@ import java.util.*;
             // create one top level collection to organize the things in the scene
             root = new Group();
             curLevel = 1;
-
             // make some shapes, set their properties, and add them to the scene
             // create a place to see the shapes
             myScene = new Scene(root, width, height, background);
@@ -516,8 +514,6 @@ import java.util.*;
         if(isHardMode == true){
             hardModeMod = 2;
         }
-
-
             populateRoot(root,width,height,source);
             possiblePowerUps = allPowerUps();
             FileInputStream imgFile = null;
@@ -527,17 +523,10 @@ import java.util.*;
                 e.printStackTrace();
             }
             Image img = new Image(imgFile);
-
-
             myMenu = new Menu(img,SIZE/2 - 200,SIZE/2 -200, "Retry");
             myMenu.setFitWidth(400);
             myMenu.setFitHeight(300);
-
             possiblePowerUps = allPowerUps();
-
-            // respond to
-
-
             myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
             return myScene;
         }

@@ -1,0 +1,237 @@
+
+  Everything here is a masterpiece for reasons that the game runs like an animation but then every time an event listener is triggered we do functions and calculations
+
+  /**
+     * This method simply writes whatever the highscore + initial combination is to the file, also sorts the score file as more scores are added
+     */
+    private void updateScoreFile(String name, int score) {
+        try {
+            FileWriter myWriter = new FileWriter("data/score.txt", true);
+            myWriter.write(name + " " + score + "\n");
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred in writing your score ");
+            e.printStackTrace();
+        }
+        sortScores();
+    }
+
+    /**
+     * this method sorts the scores file so we can easily pull high schore
+     */
+    private void sortScores(){
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("data/score.txt"));
+            ArrayList<String> lines = new ArrayList<String>();
+            String currentLine = br.readLine();
+            while (currentLine != null)
+            {
+                lines.add(currentLine);
+                currentLine = br.readLine();
+            }
+            br.close();
+            Collections.sort(lines);
+            Collections.reverse(lines);
+            FileWriter myWriter = new FileWriter("data/score.txt", false);
+            for(String str:lines){
+                myWriter.write(str);
+                myWriter.write("\n");
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred in writing your score");
+            e.printStackTrace();
+        }
+    }
+
+package breakout;
+
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+/**
+ * This class will serve to represent bricks in our game of b reakout
+ * This class extemds imagevoew amd os cpmstictired wotj a picture, an x coordinate, and a y coordinate
+ * The game will use an array of brick objectts to poplate the top portion of the screen
+ */
+public class Menu extends ImageView {
+    Button reset;
+    ImageView bg;
+
+    /**
+     * consturcts amenu based on an image or text
+     * @param img
+     * @param x
+     * @param y
+     * @param text
+     */
+    public Menu(Image img,int x, int y, String text){
+        this.setImage(img);
+        this.setX(x);
+        this.setY(y);
+        reset = new Button(text);
+        this.reset.setMaxSize(100, 200);
+
+    }
+
+    /**
+     * gets the resset button field for a given menu
+     * @return
+     */
+    public Button getReset(){
+        return reset;
+    }
+
+    /**
+     * gets the actua background image for a given menu
+     * @return
+     */
+    public ImageView getBg() {
+        return bg;
+    }
+}
+
+    /**
+     * Starts the rendering of the game menus, starting with the ruleset
+     * @param prevmenu passes the previous menu to first be removed
+     */
+    public void rulesMenu(Menu prevmenu){
+            root.getChildren().remove(prevmenu);
+            root.getChildren().remove(prevmenu.getReset());
+            Menu rules = new Menu(new Image("https://i.imgur.com/mcAYifg.png"),SIZE/2 - 200,SIZE/2 -200,"Start");
+            rules.setFitWidth(400);
+            rules.setFitHeight(400);
+            root.getChildren().add(rules);
+            Button play = rules.getReset();
+            root.getChildren().add(play);
+            play.setLayoutX(170);
+            play.setLayoutY(350);
+            play.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent e) {
+                    selectMenu(rules);
+                }
+            });
+        }
+
+    /**
+     * Displays the game mode select screen
+     * @param prevmenu
+     */
+    public void selectMenu(Menu prevmenu){
+        root.getChildren().remove(prevmenu);
+        root.getChildren().remove(prevmenu.getReset());
+        Menu selectoption = new Menu(new Image("https://i.imgur.com/HduUwse.png"),SIZE/2 - 200,SIZE/2 -200,"Start");
+        selectoption.setFitWidth(400);
+        selectoption.setFitHeight(400);
+        root.getChildren().add(selectoption);
+        Button normal = new Button("Normal");
+        Button hard = new Button("Hard");
+        Button coop = new Button("Co-Op");
+        root.getChildren().add(normal);
+        root.getChildren().add(hard);
+        root.getChildren().add(coop);
+        normal.setLayoutX(170);
+        normal.setLayoutY(200);
+        normal.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("normal",normal,hard,coop,selectoption);
+            }
+        });
+        hard.setLayoutX(170);
+        hard.setLayoutY(250);
+        hard.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("hard",normal,hard,coop,selectoption);
+            }
+        });
+        coop.setLayoutX(170);
+        coop.setLayoutY(300);
+        coop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                gamestarter("coop",normal,hard,coop,selectoption);
+
+            }
+        });
+    }
+
+    /**
+     * Clears root of all remaining menus and buttons and sets up the game config variables and starts the first level
+     * @param toKeep Which game mode the user selected
+     * @param a First button to be deleted
+     * @param b Second button to be deleted
+     * @param c Third button to be deleted
+     * @param selector Menu to be deleted/cleared
+     */
+    public void gamestarter(String toKeep, Button a, Button b, Button c, Menu selector){
+
+            if(toKeep.equals("coop"))
+                isCoOP = true;
+            else if(toKeep.equals("hard"))
+                isHardMode = true;
+        root.getChildren().remove(selector);
+        root.getChildren().remove(a);
+        root.getChildren().remove(b);
+        root.getChildren().remove(c);
+        root.getChildren().clear();
+        populateRoot(root,(int)myScene.getWidth(),(int)myScene.getHeight(),allLevelPaths.get(0));
+        myAnimation.play();
+
+
+    }
+
+
+     * Displays a screen telling the user they won
+     */
+    private void youWon() {
+        root.getChildren().clear();
+        Menu win = new Menu(new Image("https://8bitscholar.files.wordpress.com/2010/07/a_winner_is_you_1024.jpg"),SIZE/2 - 200,SIZE/2 -200,"Continue");
+        win.setFitWidth(400);
+        win.setFitHeight(300);
+        root.getChildren().add(win);
+        Button ret = win.getReset();
+        root.getChildren().add(ret);
+        ret.setLayoutX(170);
+        ret.setLayoutY(350);
+        ret.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                writeUserScore();
+            }
+        });
+
+
+    }
+
+    /**
+     * This method prompts the user to write their initials/gamerTag to the score.txt file
+     */
+    private void writeUserScore() {
+        root.getChildren().clear();
+        TextField name = new TextField();
+        name.setPromptText("Enter your epic gamer tag");
+        name.setPrefColumnCount(10);
+        name.setLayoutX(100);
+        name.setLayoutY(150);
+        name.setPrefWidth(200);
+        root.getChildren().add(name);
+        Button submit = new Button("Submit");
+        root.getChildren().add(submit);
+        submit.setLayoutX(170);
+        submit.setLayoutY(350);
+        myAnimation.stop();
+        submit.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent e) {
+                if (!name.getText().isEmpty()) {
+                    updateScoreFile(name.getText(),scoreKeeper);
+                }
+            }
+        });
+
+    }
